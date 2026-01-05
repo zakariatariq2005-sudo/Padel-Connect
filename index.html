@@ -553,6 +553,7 @@
         .facilities {
             background: var(--warm-white);
             color: var(--charcoal);
+            padding: 5rem 0;
         }
 
         .facilities .section-header .club-stamp {
@@ -565,29 +566,31 @@
 
         .facilities-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
         .facility-card {
             position: relative;
             overflow: hidden;
             background: var(--charcoal);
-            min-height: 400px;
+            min-height: 280px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 2rem;
+            padding: 1.5rem;
+            border-radius: 8px;
         }
 
         .facility-card.large {
             grid-column: span 2;
-            grid-row: span 2;
-            min-height: 600px;
+            min-height: 320px;
         }
 
         .facility-card.medium {
-            grid-row: span 2;
+            grid-column: span 1;
         }
 
         .facility-card::before {
@@ -635,15 +638,16 @@
         }
 
         .facility-card h3 {
-            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-size: clamp(1.125rem, 1.4vw, 1.375rem);
             font-weight: 700;
             color: var(--sand);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .facility-card p {
             color: rgba(245, 241, 232, 0.8);
             font-size: 0.875rem;
+            line-height: 1.4;
         }
 
         /* Courts Section */
@@ -1590,16 +1594,32 @@
             }
 
             /* Facilities */
+            .facilities {
+                padding: 3.5rem 0;
+            }
+
             .facilities-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.875rem;
             }
 
             .facility-card {
-                min-height: 280px;
+                min-height: 220px;
+                padding: 1.25rem;
+            }
+            
+            .facility-card.large {
+                min-height: 240px;
             }
 
             .facility-card h3 {
-                font-size: 1.5rem;
+                font-size: 1.125rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .facility-card p {
+                font-size: 0.8125rem;
+                line-height: 1.4;
             }
 
             /* Courts */
@@ -1741,8 +1761,8 @@
                 <li><a href="#location">Location</a></li>
             </ul>
             <div class="nav-ctas">
-                <a href="#booking" class="btn-nav btn-nav-outline">Book a Tour</a>
-                <a href="#membership" class="btn-nav btn-nav-primary">Join as Founding Member</a>
+                <a href="#booking" class="btn-nav btn-nav-outline">Book Tour</a>
+                <a href="#booking" class="btn-nav btn-nav-primary">Contact Us</a>
             </div>
             <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
                 <span></span>
@@ -1759,8 +1779,8 @@
         <a href="#membership" class="mobile-nav-link">Membership</a>
         <a href="#location" class="mobile-nav-link">Location</a>
         <div class="mobile-ctas">
-            <a href="#booking" class="btn-secondary">Book a Tour</a>
-            <a href="#membership" class="btn-primary">Join as Founding Member</a>
+            <a href="#booking" class="btn-secondary">Book Tour</a>
+            <a href="#booking" class="btn-primary">Contact Us</a>
         </div>
     </div>
 
@@ -1797,38 +1817,32 @@
             <div class="facilities-grid">
                 <div class="facility-card large">
                     <div class="facility-card-content">
-                        <h3>2 Pro Red Clay Courts</h3>
-                        <p>ITF-certified surfaces for tournament-level play and training.</p>
+                        <h3>2 Clay Courts</h3>
                     </div>
                 </div>
                 <div class="facility-card medium">
                     <div class="facility-card-content">
-                        <h3>2 Pro Grass Courts</h3>
-                        <p>Fast-surface training for serve-and-volley mastery.</p>
+                        <h3>2 Grass Courts</h3>
                     </div>
                 </div>
                 <div class="facility-card medium">
                     <div class="facility-card-content">
-                        <h3>250m Pro Jogging Track</h3>
-                        <p>Conditioning circuits integrated with court training.</p>
+                        <h3>250 Meter Jogging Track</h3>
                     </div>
                 </div>
                 <div class="facility-card">
                     <div class="facility-card-content">
-                        <h3>Fully Equipped Athlete Club Rooms</h3>
-                        <p>Recovery, preparation, and performance analysis spaces.</p>
+                        <h3>Athlete Locker Rooms</h3>
                     </div>
                 </div>
                 <div class="facility-card">
                     <div class="facility-card-content">
                         <h3>Cold Plunge</h3>
-                        <p>Athlete-grade recovery for muscle regeneration.</p>
                     </div>
                 </div>
                 <div class="facility-card">
                     <div class="facility-card-content">
                         <h3>Stretch Coach</h3>
-                        <p>Guided flexibility and mobility sessions.</p>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PadelConnect - Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #111827;
+            color: #111827;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .preview-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: #FFFFFF;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 0;
+            margin-bottom: 30px;
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1D4ED8;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #1D4ED8;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+        .btn-secondary {
+            background: #22C55E;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #16a34a;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+        }
+        .player-card {
+            border: 1px solid #e5e7eb;
+        }
+        .player-card h3 {
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        .player-info {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #111827;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #1D4ED8;
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+        }
+        .title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .subtitle {
+            color: #9ca3af;
+            margin-bottom: 30px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        .badge-primary {
+            background: #1D4ED8;
+            color: white;
+        }
+        .badge-secondary {
+            background: #22C55E;
+            color: white;
+        }
+        .status-badge {
+            padding: 12px 24px;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 18px;
+            display: inline-block;
+            margin: 20px 0;
+        }
+        .status-waiting {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #fbbf24;
+        }
+        .status-in-progress {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+        .match-card {
+            border: 2px solid;
+            padding: 24px;
+        }
+        .match-card-player1 {
+            border-color: #1D4ED8;
+        }
+        .match-card-player2 {
+            border-color: #22C55E;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">PadelConnect</div>
+            <button class="btn btn-primary">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Login Page Preview -->
+        <div class="preview-section">
+            <h2 style="color: #1D4ED8; margin-bottom: 20px;">📱 Login Page</h2>
+            <div class="login-form" style="max-width: 100%;">
+                <h1 style="font-family: 'Montserrat', sans-serif; font-size: 28px; color: #1D4ED8; text-align: center; margin-bottom: 8px;">PadelConnect</h1>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 32px;">Welcome back! Please log in to continue.</p>
+                
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="you@example.com" value="player@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="••••••••" value="••••••••">
+                </div>
+                
+                <button class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; margin-bottom: 20px;">Log In</button>
+                
+                <p style="text-align: center; color: #6b7280; font-size: 14px;">
+                    Don't have an account? <a href="#" style="color: #22C55E; font-weight: 500;">Sign up</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Dashboard Preview -->
+        <div class="preview-section" style="background: #111827; color: white;">
+            <h2 style="color: white; margin-bottom: 20px;">📊 Dashboard Page</h2>
+            <div style="margin-bottom: 30px;">
+                <h1 class="title">Online Players</h1>
+                <p class="subtitle">Find players to match with and start playing padel!</p>
+            </div>
+            
+            <div class="grid">
+                <div class="card player-card">
+                    <h3>Alex Johnson</h3>
+                    <div class="player-info">
+                        <strong>Skill:</strong> Intermediate<br>
+                        <strong>Location:</strong> Madrid, Spain
+                    </div>
+                    <button class="btn btn-secondary" style="width: 100%;">Request Match</button>
+                </div>
+                
+                <div class="card player-card">
+                    <h3>Maria Garcia</h3>
+                    <div class="player-info">
+                        <strong>Skill:</strong> Advanced<br>
+                        <strong>Location:</strong> Barcelona, Spain
+                    </div>
+                    <button class="btn btn-secondary" style="width: 100%;">Request Match</button>
+                </div>
+                
+                <div class="card player-card">
+                    <h3>David Smith</h3>
+                    <div class="player-info">
+                        <strong>Skill:</strong> Beginner<br>
+                        <strong>Location:</strong> London, UK
+                    </div>
+                    <button class="btn btn-secondary" style="width: 100%;">Request Match</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Match Preview -->
+        <div class="preview-section" style="background: #111827; color: white;">
+            <h2 style="color: white; margin-bottom: 30px;">🎾 Live Match Page</h2>
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div class="status-badge status-in-progress">🎾 In Progress</div>
+            </div>
+            
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 24px;">
+                <div class="card match-card match-card-player1">
+                    <div style="text-align: center;">
+                        <span class="badge badge-primary">You</span>
+                        <h2 style="font-family: 'Montserrat', sans-serif; font-size: 24px; margin: 12px 0;">John Doe</h2>
+                        <div style="color: #6b7280; font-size: 14px;">
+                            <p><strong>Skill Level:</strong> Intermediate</p>
+                            <p><strong>Location:</strong> Madrid, Spain</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card match-card match-card-player2">
+                    <div style="text-align: center;">
+                        <span class="badge badge-secondary">Opponent</span>
+                        <h2 style="font-family: 'Montserrat', sans-serif; font-size: 24px; margin: 12px 0;">Alex Johnson</h2>
+                        <div style="color: #6b7280; font-size: 14px;">
+                            <p><strong>Skill Level:</strong> Advanced</p>
+                            <p><strong>Location:</strong> Barcelona, Spain</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 24px; background: white; color: #111827;">
+                <h3 style="margin-bottom: 16px;">Match Information</h3>
+                <div style="color: #6b7280; font-size: 14px;">
+                    <p><strong>Match ID:</strong> abc123</p>
+                    <p><strong>Status:</strong> In Progress</p>
+                    <p><strong>Created:</strong> Just now</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Color Scheme -->
+        <div class="preview-section">
+            <h2 style="color: #1D4ED8; margin-bottom: 20px;">🎨 Brand Colors</h2>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="text-align: center;">
+                    <div style="width: 100px; height: 100px; background: #1D4ED8; border-radius: 8px; margin-bottom: 8px;"></div>
+                    <strong>Primary Blue</strong><br>
+                    <small>#1D4ED8</small>
+                </div>
+                <div style="text-align: center;">
+                    <div style="width: 100px; height: 100px; background: #22C55E; border-radius: 8px; margin-bottom: 8px;"></div>
+                    <strong>Secondary Green</strong><br>
+                    <small>#22C55E</small>
+                </div>
+                <div style="text-align: center;">
+                    <div style="width: 100px; height: 100px; background: #FFFFFF; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px;"></div>
+                    <strong>Neutral White</strong><br>
+                    <small>#FFFFFF</small>
+                </div>
+                <div style="text-align: center;">
+                    <div style="width: 100px; height: 100px; background: #111827; border-radius: 8px; margin-bottom: 8px;"></div>
+                    <strong>Dark Gray</strong><br>
+                    <small>#111827</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="preview-section">
+            <h2 style="color: #1D4ED8; margin-bottom: 20px;">✨ Features</h2>
+            <ul style="line-height: 2; color: #374151;">
+                <li>🔐 Email/password authentication with Supabase</li>
+                <li>👥 View all online players with skill levels and locations</li>
+                <li>🎾 Send and receive match requests</li>
+                <li>⚡ Real-time match status updates</li>
+                <li>📱 Fully responsive design</li>
+                <li>🎨 Custom branding (Blue & Lime Green)</li>
+                <li>🔒 Secure with Row Level Security</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="background: #111827; color: white; text-align: center; padding: 40px 20px; margin-top: 40px;">
+        <h3 style="font-family: 'Montserrat', sans-serif; margin-bottom: 12px;">Ready to Run the App?</h3>
+        <p style="color: #9ca3af; margin-bottom: 20px;">To see the fully functional app:</p>
+        <ol style="text-align: left; max-width: 600px; margin: 0 auto; color: #d1d5db; line-height: 2;">
+            <li>Install Node.js from <a href="https://nodejs.org" style="color: #22C55E;">nodejs.org</a></li>
+            <li>Run: <code style="background: #1f2937; padding: 4px 8px; border-radius: 4px;">npm install</code></li>
+            <li>Set up Supabase (see SUPABASE_SETUP.md)</li>
+            <li>Create .env.local with your credentials</li>
+            <li>Run: <code style="background: #1f2937; padding: 4px 8px; border-radius: 4px;">npm run dev</code></li>
+            <li>Open: <code style="background: #1f2937; padding: 4px 8px; border-radius: 4px;">http://localhost:3000</code></li>
+        </ol>
+    </div>
+</body>
+</html>
+
+

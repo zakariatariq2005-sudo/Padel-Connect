@@ -1,0 +1,38 @@
+# Example GitHub Actions workflow (optional)
+# 
+# Note: Vercel handles deployments automatically via their integration.
+# This file is just an example - you don't need it for basic Vercel deployment.
+#
+# If you want to use GitHub Actions for additional CI/CD tasks, you can
+# rename this file to vercel-deploy.yml (remove .example)
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build
+      run: npm run build
+      env:
+        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+
