@@ -1,4 +1,4 @@
-# PadelConnect - GitHub Repository Information
+# Impero Sport - GitHub Repository Information
 
 ## ✅ Repository Ready!
 
@@ -7,7 +7,7 @@ Your complete GitHub repository is live and ready to use!
 ### 🔗 Repository URL
 
 **GitHub Repository:**  
-https://github.com/zakariatariq2005-sudo/padelconnect
+https://github.com/zakariatariq2005-sudo/impero-sport
 
 ---
 
@@ -57,7 +57,7 @@ https://github.com/zakariatariq2005-sudo/padelconnect
 
 ### Option 1: Download as ZIP from GitHub (Easiest)
 
-1. Go to: https://github.com/zakariatariq2005-sudo/padelconnect
+1. Go to: https://github.com/zakariatariq2005-sudo/impero-sport
 2. Click the green **"Code"** button
 3. Select **"Download ZIP"**
 4. Extract the ZIP file
@@ -66,16 +66,16 @@ https://github.com/zakariatariq2005-sudo/padelconnect
 ### Option 2: Clone with Git
 
 ```bash
-git clone https://github.com/zakariatariq2005-sudo/padelconnect.git
-cd padelconnect
+git clone https://github.com/zakariatariq2005-sudo/impero-sport.git
+cd impero-sport
 npm install
 ```
 
 ### Option 3: Use GitHub CLI
 
 ```bash
-gh repo clone zakariatariq2005-sudo/padelconnect
-cd padelconnect
+gh repo clone zakariatariq2005-sudo/impero-sport
+cd impero-sport
 npm install
 ```
 
@@ -136,7 +136,7 @@ Since your code is on GitHub, you can:
 
 1. Go to https://vercel.com
 2. Sign in with GitHub
-3. Import the `padelconnect` repository
+3. Import the `impero-sport` repository
 4. Add environment variables
 5. Deploy!
 
@@ -168,6 +168,6 @@ See `DEPLOY_FROM_GITHUB.md` for detailed instructions.
 
 **Your repository is complete and ready to use!** 🎉
 
-**Direct Link:** https://github.com/zakariatariq2005-sudo/padelconnect
+**Direct Link:** https://github.com/zakariatariq2005-sudo/impero-sport
 
 

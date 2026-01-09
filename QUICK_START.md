@@ -1,6 +1,6 @@
-# Quick Start Guide - PadelConnect
+# Quick Start Guide - Impero Sport
 
-Get your PadelConnect app running in 5 minutes!
+Get your Impero Sport app running in 5 minutes!
 
 ## Step 1: Install Dependencies
 

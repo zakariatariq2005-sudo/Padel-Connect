@@ -29,7 +29,7 @@ I cannot directly push to GitHub because it requires:
 
 4. **Publish**:
    - Click "Publish repository" button
-   - Name: `padelconnect`
+   - Name: `impero-sport`
    - Choose Public or Private
    - Click "Publish"
 
@@ -43,7 +43,7 @@ If you have GitHub CLI installed and authenticated:
 
 ```bash
 cd /Users/zakariatariq/Desktop/dev/project
-gh repo create padelconnect --public --source=. --remote=origin --push
+gh repo create impero-sport --public --source=. --remote=origin --push
 ```
 
 This will create the repo and push in one command!
@@ -59,7 +59,7 @@ This will create the repo and push in one command!
 ### Step 1: Create Repository on GitHub
 
 1. Go to: https://github.com/new
-2. Repository name: `padelconnect`
+2. Repository name: `impero-sport`
 3. Description: "Padel player matching app"
 4. Choose Public or Private
 5. **DON'T** check "Initialize with README"
@@ -71,7 +71,7 @@ This will create the repo and push in one command!
 
 ```bash
 cd /Users/zakariatariq/Desktop/dev/project
-git remote add origin https://github.com/YOUR_USERNAME/padelconnect.git
+git remote add origin https://github.com/YOUR_USERNAME/impero-sport.git
 git branch -M main
 git push -u origin main
 ```
@@ -86,7 +86,7 @@ When prompted:
 1. GitHub.com → Your profile → Settings
 2. Developer settings → Personal access tokens → Tokens (classic)
 3. Generate new token (classic)
-4. Name: "PadelConnect"
+4. Name: "Impero Sport"
 5. Select: `repo` scope
 6. Generate → Copy the token
 7. Paste it as the password
@@ -95,7 +95,7 @@ When prompted:
 
 ## ✅ Verify It Worked
 
-Visit: `https://github.com/YOUR_USERNAME/padelconnect`
+Visit: `https://github.com/YOUR_USERNAME/impero-sport`
 
 You should see all 44 files!
 

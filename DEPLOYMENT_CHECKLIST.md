@@ -1,6 +1,6 @@
 # Deployment Checklist
 
-Use this checklist to ensure your PadelConnect app is ready for deployment.
+Use this checklist to ensure your Impero Sport app is ready for deployment.
 
 ## Pre-Deployment Checklist
 
@@ -122,7 +122,7 @@ Your deployment is successful when:
 
 ## Quick Reference
 
-**GitHub Repository**: `https://github.com/YOUR_USERNAME/padelconnect`
+**GitHub Repository**: `https://github.com/YOUR_USERNAME/impero-sport`
 
 **Vercel Dashboard**: `https://vercel.com/dashboard`
 

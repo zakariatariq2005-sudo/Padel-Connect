@@ -4,7 +4,7 @@ Your repository is ready! Now just connect it to Vercel.
 
 ## ✅ What's Already Done
 
-- ✅ Code is on GitHub: https://github.com/zakariatariq2005-sudo/padelconnect
+- ✅ Code is on GitHub: https://github.com/zakariatariq2005-sudo/impero-sport
 - ✅ All files are committed and pushed
 - ✅ Repository is public and ready
 
@@ -20,7 +20,7 @@ Your repository is ready! Now just connect it to Vercel.
 1. After signing in, you'll see the Vercel dashboard
 2. Click **"Add New..."** → **"Project"**
 3. You'll see a list of your GitHub repositories
-4. Find **"padelconnect"** in the list
+4. Find **"impero-sport"** in the list
 5. Click **"Import"** next to it
 
 ### Step 3: Configure Project (Usually Auto-Detected)
@@ -73,7 +73,7 @@ Before deploying, add your Supabase credentials:
 
 Before clicking Deploy:
 - [ ] Signed in to Vercel with GitHub
-- [ ] Imported the `padelconnect` repository
+- [ ] Imported the `impero-sport` repository
 - [ ] Added `NEXT_PUBLIC_SUPABASE_URL` environment variable
 - [ ] Added `NEXT_PUBLIC_SUPABASE_ANON_KEY` environment variable
 - [ ] Selected all environments for both variables
@@ -96,7 +96,7 @@ If you don't have them yet:
 
 ## ✅ After Deployment
 
-1. **Your app will be live** at a URL like: `https://padelconnect.vercel.app`
+1. **Your app will be live** at a URL like: `https://impero-sport.vercel.app`
 2. **Test it**: Try signing up with a new account
 3. **Check it works**: Make sure you can log in and see the dashboard
 
@@ -144,7 +144,7 @@ To update your app:
 
 1. Go to vercel.com
 2. Sign in with GitHub
-3. Import `padelconnect` repository
+3. Import `impero-sport` repository
 4. Add 2 environment variables (Supabase credentials)
 5. Click Deploy!
 
@@ -152,7 +152,7 @@ That's it! Your app will be live in minutes! 🚀
 
 ---
 
-**Your Repository:** https://github.com/zakariatariq2005-sudo/padelconnect  
+**Your Repository:** https://github.com/zakariatariq2005-sudo/impero-sport  
 **Vercel Dashboard:** https://vercel.com/dashboard
 
 

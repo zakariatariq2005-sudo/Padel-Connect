@@ -1,6 +1,6 @@
-# Supabase Setup Instructions for PadelConnect
+# Supabase Setup Instructions for Impero Sport
 
-This document explains how to set up your Supabase database and configure the necessary tables, security policies, and real-time subscriptions for the PadelConnect application.
+This document explains how to set up your Supabase database and configure the necessary tables, security policies, and real-time subscriptions for the Impero Sport application.
 
 ## Prerequisites
 

@@ -51,7 +51,7 @@ git init
 git add .
 
 # Create your first commit
-git commit -m "Initial commit: PadelConnect app"
+git commit -m "Initial commit: Impero Sport app"
 ```
 
 **What each command does:**
@@ -64,7 +64,7 @@ git commit -m "Initial commit: PadelConnect app"
 1. Go to https://github.com and sign in (create account if needed)
 2. Click the **"+"** icon (top right) → **"New repository"**
 3. Fill in:
-   - **Name**: `padelconnect` (or any name)
+   - **Name**: `impero-sport` (or any name)
    - **Description**: "Padel player matching app"
    - **Visibility**: Public or Private (your choice)
    - **DO NOT** check "Initialize with README" (we already have files)
@@ -76,7 +76,7 @@ GitHub will show you commands. Use the "push an existing repository" option:
 
 ```bash
 # Replace YOUR_USERNAME with your GitHub username
-git remote add origin https://github.com/YOUR_USERNAME/padelconnect.git
+git remote add origin https://github.com/YOUR_USERNAME/impero-sport.git
 
 # Rename branch to 'main' (GitHub's default)
 git branch -M main

@@ -3,20 +3,20 @@
 ## 📦 Step 1: Extract the ZIP File
 
 ### Mac:
-1. Double-click `PadelConnect-Complete.zip`
-2. A folder named `PadelConnect-Complete` will appear
-3. Rename it to `padelconnect` (optional, but cleaner)
+1. Double-click `Impero Sport-Complete.zip`
+2. A folder named `Impero Sport-Complete` will appear
+3. Rename it to `impero-sport` (optional, but cleaner)
 
 ### Windows:
-1. Right-click `PadelConnect-Complete.zip`
+1. Right-click `Impero Sport-Complete.zip`
 2. Select "Extract All..."
 3. Choose a location (Desktop is fine)
 4. Click "Extract"
 
 ### Linux:
 ```bash
-unzip PadelConnect-Complete.zip
-cd PadelConnect-Complete
+unzip Impero Sport-Complete.zip
+cd Impero Sport-Complete
 ```
 
 ---
@@ -26,7 +26,7 @@ cd PadelConnect-Complete
 Open terminal/command prompt in the extracted folder:
 
 ```bash
-cd padelconnect  # or wherever you extracted it
+cd impero-sport  # or wherever you extracted it
 npm install
 ```
 
@@ -42,11 +42,11 @@ Wait 2-5 minutes for packages to install.
 2. **Install and sign in** with your GitHub account
 3. **Add the project**:
    - File → "Add Local Repository"
-   - Click "Choose..." and select your `padelconnect` folder
+   - Click "Choose..." and select your `impero-sport` folder
    - Click "Add Repository"
 4. **Publish**:
    - Click "Publish repository" button
-   - Name: `padelconnect`
+   - Name: `impero-sport`
    - Description: "Padel player matching app"
    - Choose Public or Private
    - **UNCHECK** "Keep this code private" (if you want public)
@@ -58,7 +58,7 @@ Wait 2-5 minutes for packages to install.
 
 ### Alternative: Using Terminal
 
-1. **Open terminal** in your `padelconnect` folder
+1. **Open terminal** in your `impero-sport` folder
 
 2. **Run these commands**:
 
@@ -70,10 +70,10 @@ git init
 git add .
 
 # Create first commit
-git commit -m "Initial commit: PadelConnect app"
+git commit -m "Initial commit: Impero Sport app"
 
 # Create repository on GitHub first, then:
-git remote add origin https://github.com/YOUR_USERNAME/padelconnect.git
+git remote add origin https://github.com/YOUR_USERNAME/impero-sport.git
 git branch -M main
 git push -u origin main
 ```
@@ -89,7 +89,7 @@ Replace `YOUR_USERNAME` with your actual GitHub username!
 
 ## ✅ Verify Upload
 
-1. Go to https://github.com/YOUR_USERNAME/padelconnect
+1. Go to https://github.com/YOUR_USERNAME/impero-sport
 2. You should see all your files!
 3. Check that these files exist:
    - `package.json`

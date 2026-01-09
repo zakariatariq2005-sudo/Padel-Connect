@@ -1,6 +1,6 @@
 # Deploy to Vercel Directly from GitHub
 
-Your code is already on GitHub at: **https://github.com/zakariatariq2005-sudo/padelconnect**
+Your code is already on GitHub at: **https://github.com/zakariatariq2005-sudo/impero-sport**
 
 Now let's deploy it to Vercel in 3 simple steps!
 
@@ -17,7 +17,7 @@ Now let's deploy it to Vercel in 3 simple steps!
 1. After signing in, you'll see the Vercel dashboard
 2. Click **"Add New..."** → **"Project"**
 3. You'll see a list of your GitHub repositories
-4. Find **"padelconnect"** in the list
+4. Find **"impero-sport"** in the list
 5. Click **"Import"** next to it
 
 ### Step 3: Configure and Deploy
@@ -52,7 +52,7 @@ Vercel will automatically detect it's a Next.js project. The settings should be:
 
 1. Click the **"Deploy"** button
 2. Wait 2-5 minutes for the build to complete
-3. Once done, you'll see a URL like: `https://padelconnect.vercel.app`
+3. Once done, you'll see a URL like: `https://impero-sport.vercel.app`
 4. Click the URL to see your live app! 🎉
 
 ---
@@ -134,9 +134,9 @@ If you don't have them yet:
 
 ## 🎯 Your Repository
 
-GitHub: https://github.com/zakariatariq2005-sudo/padelconnect
+GitHub: https://github.com/zakariatariq2005-sudo/impero-sport
 
-Once deployed, your live app will be at: `https://padelconnect.vercel.app` (or similar)
+Once deployed, your live app will be at: `https://impero-sport.vercel.app` (or similar)
 
 ---
 

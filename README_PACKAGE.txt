@@ -1,11 +1,11 @@
 ═══════════════════════════════════════════════════════════════
-  PADELCONNECT - COMPLETE PROJECT PACKAGE
+  IMPERO SPORT - COMPLETE PROJECT PACKAGE
 ═══════════════════════════════════════════════════════════════
 
 📦 PACKAGE CONTENTS
 ───────────────────────────────────────────────────────────────
 
-This ZIP file contains the complete PadelConnect Next.js application.
+This ZIP file contains the complete Impero Sport Next.js application.
 
 INCLUDED:
 ✅ All source code (app/, components/, lib/)
@@ -27,7 +27,7 @@ EXCLUDED (as they should be):
 1. EXTRACT the ZIP file to a folder
 
 2. INSTALL dependencies:
-   cd padelconnect
+   cd impero-sport
    npm install
 
 3. SET UP Supabase:
@@ -95,7 +95,7 @@ Before starting:
 
 Need help? All documentation files have detailed explanations!
 
-Good luck with your PadelConnect deployment! 🚀
+Good luck with your Impero Sport deployment! 🚀
 
 ═══════════════════════════════════════════════════════════════
 

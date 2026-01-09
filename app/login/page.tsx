@@ -60,7 +60,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="bg-neutral rounded-lg shadow-xl p-8">
           <h1 className="text-3xl font-heading font-bold text-primary mb-2 text-center">
-            PadelConnect
+            Impero Sport
           </h1>
           <p className="text-gray-600 text-center mb-8">Welcome back! Please log in to continue.</p>
 

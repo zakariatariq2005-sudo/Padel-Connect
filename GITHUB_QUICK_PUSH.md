@@ -24,7 +24,7 @@ Your code is already committed and ready to push! Follow these steps:
 
 4. **Publish to GitHub**:
    - Click the "Publish repository" button (top right)
-   - Repository name: `padelconnect` (or your choice)
+   - Repository name: `impero-sport` (or your choice)
    - Description: "Padel player matching app - Next.js + Supabase"
    - Choose: Public or Private
    - ✅ **UNCHECK** "Keep this code private" (if you want public)
@@ -39,7 +39,7 @@ Your code is already committed and ready to push! Follow these steps:
 ### Step 1: Create Repository on GitHub First
 
 1. Go to https://github.com/new
-2. Repository name: `padelconnect`
+2. Repository name: `impero-sport`
 3. Description: "Padel player matching app - Next.js + Supabase"
 4. Choose Public or Private
 5. **DO NOT** check "Initialize with README"
@@ -54,7 +54,7 @@ Copy and paste these commands **one by one**:
 cd /Users/zakariatariq/Desktop/dev/project
 
 # Add GitHub as remote (replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/padelconnect.git
+git remote add origin https://github.com/YOUR_USERNAME/impero-sport.git
 
 # Rename branch to main
 git branch -M main
@@ -71,7 +71,7 @@ git push -u origin main
 1. GitHub → Settings (your profile) → Developer settings
 2. Personal access tokens → Tokens (classic)
 3. Generate new token (classic)
-4. Name: "PadelConnect"
+4. Name: "Impero Sport"
 5. Select scope: `repo` (full control)
 6. Generate token
 7. Copy the token (you won't see it again!)
@@ -83,7 +83,7 @@ git push -u origin main
 
 After pushing, visit:
 ```
-https://github.com/YOUR_USERNAME/padelconnect
+https://github.com/YOUR_USERNAME/impero-sport
 ```
 
 You should see all your files!

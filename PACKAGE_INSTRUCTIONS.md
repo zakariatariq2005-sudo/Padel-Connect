@@ -1,8 +1,8 @@
-# PadelConnect - Complete Package Instructions
+# Impero Sport - Complete Package Instructions
 
 ## 📦 Package Contents
 
-This ZIP file contains the complete PadelConnect Next.js application, ready to deploy!
+This ZIP file contains the complete Impero Sport Next.js application, ready to deploy!
 
 ### What's Included
 
@@ -45,15 +45,15 @@ This ZIP file contains the complete PadelConnect Next.js application, ready to d
 
 ### Step 1: Extract the ZIP File
 
-1. **Locate the ZIP file**: `PadelConnect-Complete.zip`
+1. **Locate the ZIP file**: `Impero Sport-Complete.zip`
 2. **Extract it**:
    - **Mac**: Double-click the ZIP file, or right-click → "Open With" → "Archive Utility"
    - **Windows**: Right-click → "Extract All..."
-   - **Linux**: `unzip PadelConnect-Complete.zip`
+   - **Linux**: `unzip Impero Sport-Complete.zip`
 
 3. **Extract to a folder** like:
-   - `~/Desktop/padelconnect` (Mac/Linux)
-   - `C:\Users\YourName\Desktop\padelconnect` (Windows)
+   - `~/Desktop/impero-sport` (Mac/Linux)
+   - `C:\Users\YourName\Desktop\impero-sport` (Windows)
 
 ### Step 2: Install Dependencies
 
@@ -99,7 +99,7 @@ Open http://localhost:3000 in your browser!
    - Click "Add Repository"
 4. **Publish to GitHub**:
    - Click "Publish repository"
-   - Choose repository name (e.g., "padelconnect")
+   - Choose repository name (e.g., "impero-sport")
    - Choose Public or Private
    - Click "Publish Repository"
 
@@ -121,18 +121,18 @@ Done! Your code is now on GitHub.
 
 4. **Create first commit**:
    ```bash
-   git commit -m "Initial commit: PadelConnect app"
+   git commit -m "Initial commit: Impero Sport app"
    ```
 
 5. **Create repository on GitHub**:
    - Go to https://github.com/new
-   - Repository name: `padelconnect` (or your choice)
+   - Repository name: `impero-sport` (or your choice)
    - Don't initialize with README (we already have one)
    - Click "Create repository"
 
 6. **Connect and push**:
    ```bash
-   git remote add origin https://github.com/YOUR_USERNAME/padelconnect.git
+   git remote add origin https://github.com/YOUR_USERNAME/impero-sport.git
    git branch -M main
    git push -u origin main
    ```
@@ -146,12 +146,12 @@ Done! Your code is now on GitHub.
 ### Option C: Using GitHub Web Interface
 
 1. **Create a new repository** on GitHub (https://github.com/new)
-   - Name: `padelconnect`
+   - Name: `impero-sport`
    - Don't initialize with README
 
 2. **Use GitHub CLI** (if installed):
    ```bash
-   gh repo create padelconnect --public --source=. --remote=origin --push
+   gh repo create impero-sport --public --source=. --remote=origin --push
    ```
 
 3. **Or use the web interface**:
@@ -226,6 +226,6 @@ This package contains everything you need to:
 - Deploy to Vercel
 - Understand how everything works
 
-Good luck with your PadelConnect deployment! 🚀
+Good luck with your Impero Sport deployment! 🚀
 
 

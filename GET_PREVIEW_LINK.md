@@ -6,7 +6,7 @@ Your app needs to be deployed to get a live preview URL. Here's the fastest way:
 
 ### Option 1: Deploy to Vercel (5 Minutes - Recommended)
 
-**This will give you a live URL like: `https://padelconnect.vercel.app`**
+**This will give you a live URL like: `https://impero-sport.vercel.app`**
 
 1. **Go to Vercel:**
    - Open: https://vercel.com/new
@@ -14,7 +14,7 @@ Your app needs to be deployed to get a live preview URL. Here's the fastest way:
    - Choose "Continue with GitHub"
 
 2. **Import Your Repository:**
-   - You'll see: `zakariatariq2005-sudo/padelconnect`
+   - You'll see: `zakariatariq2005-sudo/impero-sport`
    - Click "Import"
 
 3. **Add Environment Variables:**
@@ -28,7 +28,7 @@ Your app needs to be deployed to get a live preview URL. Here's the fastest way:
    - Wait 2-5 minutes
    - You'll get your preview link! 🎉
 
-**Your preview link will be:** `https://padelconnect-[hash].vercel.app` or `https://padelconnect.vercel.app`
+**Your preview link will be:** `https://impero-sport-[hash].vercel.app` or `https://impero-sport.vercel.app`
 
 ---
 
