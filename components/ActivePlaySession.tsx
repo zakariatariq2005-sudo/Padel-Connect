@@ -54,7 +54,7 @@ export default function ActivePlaySession({
             Looking for players…
           </h3>
           <p className="text-gray-400 mb-4">
-            We'll notify you when someone matches your availability.
+            We&apos;ll notify you when someone matches your availability.
           </p>
         </div>
         <span className="px-3 py-1 rounded-full text-sm font-semibold bg-green-500/20 text-green-400 border border-green-500/30">
