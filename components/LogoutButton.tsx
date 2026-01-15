@@ -6,31 +6,24 @@ import { createClient } from '@/lib/supabase/client';
 /**
  * Logout Button Component
  * 
- * This component handles user logout. When clicked, it:
- * 1. Updates the player's online status to false
- * 2. Signs out the user from Supabase
- * 3. Redirects to the login page
+ * Premium logout button with icon.
+ * Updates player online status and signs out user.
  */
 export default function LogoutButton() {
   const router = useRouter();
   const supabase = createClient();
 
   const handleLogout = async () => {
-    // Get current user to update their online status
     const { data: { user } } = await supabase.auth.getUser();
     
     if (user) {
-      // Set player as offline
       await supabase
         .from('players')
         .update({ is_online: false })
         .eq('user_id', user.id);
     }
 
-    // Sign out from Supabase
     await supabase.auth.signOut();
-    
-    // Redirect to login page
     router.push('/login');
     router.refresh();
   };
@@ -38,11 +31,14 @@ export default function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="bg-gray-200 text-dark font-medium py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition"
+      className="p-2.5 bg-dark-lighter hover:bg-dark-lighter/80 border border-white/10 
+                 rounded-xl text-gray-300 hover:text-white transition-all duration-200
+                 active:scale-95"
+      title="Logout"
     >
-      Logout
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      </svg>
     </button>
   );
 }
-
-
