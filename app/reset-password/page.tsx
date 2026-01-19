@@ -21,10 +21,15 @@ export default function ResetPasswordPage() {
   const supabase = createClient();
 
   useEffect(() => {
-    // Check if we have the hash from the email link
-    const hash = searchParams.get('hash');
-    if (!hash) {
-      setError('Invalid reset link. Please request a new password reset.');
+    // Check if we have the access token from the email link (in hash fragment)
+    // Supabase sends tokens in the URL hash, not query params
+    const hash = window.location.hash;
+    if (!hash || !hash.includes('access_token')) {
+      // Check if token is in query params (fallback)
+      const token = searchParams.get('access_token');
+      if (!token) {
+        setError('Invalid reset link. Please request a new password reset.');
+      }
     }
   }, [searchParams]);
 
@@ -45,6 +50,26 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
+      // Extract token from URL hash if present (Supabase sends it in hash)
+      const hash = window.location.hash;
+      if (hash) {
+        // Parse the hash to get the access_token
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get('access_token');
+        if (accessToken) {
+          // Set the session using the recovery token
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: params.get('refresh_token') || '',
+          });
+          if (sessionError) {
+            setError('Invalid or expired reset link. Please request a new password reset.');
+            setLoading(false);
+            return;
+          }
+        }
+      }
+
       // Update the password
       const { error: updateError } = await supabase.auth.updateUser({
         password: password,
