@@ -47,6 +47,13 @@ export default function SignupPage() {
       });
 
       if (signUpError) {
+        // Check if user already exists
+        if (signUpError.message.includes('already registered') || signUpError.message.includes('already exists')) {
+          setError('An account with this email already exists. Please log in instead.');
+          setLoading(false);
+          setTimeout(() => router.push('/login'), 2000);
+          return;
+        }
         setError(signUpError.message);
         setLoading(false);
         return;
@@ -63,6 +70,30 @@ export default function SignupPage() {
       // If no session, email confirmation is required
       if (authData.session) {
         // User is automatically logged in (email confirmation disabled)
+        // Check if profile already exists
+        const { data: existingProfile } = await supabase
+          .from('players')
+          .select('id')
+          .eq('user_id', authData.user.id)
+          .single();
+
+        if (existingProfile) {
+          // Profile already exists, just update it and redirect
+          await supabase
+            .from('players')
+            .update({
+              name: formData.name,
+              skill_level: formData.skillLevel,
+              location: formData.location,
+              is_online: true,
+            })
+            .eq('user_id', authData.user.id);
+          
+          router.push('/dashboard');
+          router.refresh();
+          return;
+        }
+
         // Create the player profile in our database
         const { error: profileError } = await supabase
           .from('players')
@@ -75,6 +106,23 @@ export default function SignupPage() {
           });
 
         if (profileError) {
+          // If profile already exists (unique constraint), try to update it
+          if (profileError.code === '23505' || profileError.message.includes('unique')) {
+            await supabase
+              .from('players')
+              .update({
+                name: formData.name,
+                skill_level: formData.skillLevel,
+                location: formData.location,
+                is_online: true,
+              })
+              .eq('user_id', authData.user.id);
+            
+            router.push('/dashboard');
+            router.refresh();
+            return;
+          }
+          
           setError('Account created but failed to create profile. Please try logging in.');
           setLoading(false);
           return;
@@ -85,19 +133,31 @@ export default function SignupPage() {
         router.refresh();
       } else {
         // Email confirmation is required
-        // Create player profile - it will be activated when they confirm email
-        const { error: profileError } = await supabase
+        // Check if profile already exists
+        const { data: existingProfile } = await supabase
           .from('players')
-          .insert({
-            user_id: authData.user.id,
-            name: formData.name,
-            skill_level: formData.skillLevel,
-            location: formData.location,
-            is_online: false, // Set to false until they confirm and log in
-          });
+          .select('id')
+          .eq('user_id', authData.user.id)
+          .single();
 
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
+        if (!existingProfile) {
+          // Create player profile - it will be activated when they confirm email
+          const { error: profileError } = await supabase
+            .from('players')
+            .insert({
+              user_id: authData.user.id,
+              name: formData.name,
+              skill_level: formData.skillLevel,
+              location: formData.location,
+              is_online: false, // Set to false until they confirm and log in
+            });
+
+          if (profileError) {
+            // If profile already exists, just log it
+            if (profileError.code !== '23505' && !profileError.message.includes('unique')) {
+              console.error('Profile creation error:', profileError);
+            }
+          }
         }
 
         // Show success message with resend option
