@@ -161,18 +161,26 @@ export default function DashboardPage() {
       setMatchesThisWeek(matchesCount || 0);
 
       // Load online players (excluding current user)
-      const { data: onlinePlayersData, error: playersError } = await supabase
+      // First, let's try without the neq filter to see all players
+      const { data: allPlayers, error: allPlayersError } = await supabase
         .from('players')
         .select('*')
-        .eq('is_online', true)
-        .neq('user_id', session.user.id)
-        .order('created_at', { ascending: false });
+        .eq('is_online', true);
 
-      if (playersError) {
-        console.error('Error loading online players:', playersError);
+      console.log('All online players (including self):', allPlayers);
+      console.log('Current user ID:', session.user.id);
+
+      if (allPlayersError) {
+        console.error('Error loading all online players:', allPlayersError);
       }
 
-      setOnlinePlayers(onlinePlayersData || []);
+      // Filter out current user
+      const filteredPlayers = (allPlayers || []).filter(
+        (p: any) => p.user_id !== session.user.id
+      );
+
+      console.log('Filtered online players (excluding self):', filteredPlayers);
+      setOnlinePlayers(filteredPlayers);
 
       setLoading(false);
     } catch (error) {
@@ -421,15 +429,19 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* 3.5. Online Players (if not in play session) */}
+        {/* 3.5. Online Players (if not in play session) - ALWAYS SHOW */}
         {!playSession && (
-          <div className="mb-6">
+          <div className="mb-6" id="online-players-section">
             <div className="glass-card card-shadow p-5">
               <h3 className="text-xl font-heading font-bold text-neutral mb-4 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></span>
                 Online Players {onlinePlayers.length > 0 && `(${onlinePlayers.length})`}
               </h3>
-              {onlinePlayers.length > 0 ? (
+              {loading ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-400">Loading players...</p>
+                </div>
+              ) : onlinePlayers.length > 0 ? (
                 <PlayerList 
                   players={onlinePlayers} 
                   currentUserId={user?.id || ''} 
@@ -437,7 +449,11 @@ export default function DashboardPage() {
               ) : (
                 <div className="text-center py-8">
                   <p className="text-gray-400 mb-2">No other players online right now</p>
-                  <p className="text-sm text-gray-500">Make sure you're online (toggle in top right) and other players are also online to see them here.</p>
+                  <p className="text-sm text-gray-500 mb-4">Make sure you're online (toggle in top right) and other players are also online to see them here.</p>
+                  <div className="text-xs text-gray-600 mt-4 p-3 bg-dark-lighter rounded">
+                    <p>Debug info: Your user ID is {user?.id?.substring(0, 8)}...</p>
+                    <p>Online players count: {onlinePlayers.length}</p>
+                  </div>
                 </div>
               )}
             </div>
