@@ -143,7 +143,7 @@ export default function LoginPage() {
                 }
                 const supabase = createClient();
                 const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-                  redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/reset-password` : undefined,
+                  redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/reset-password` : 'https://padel-connect-cyan.vercel.app/reset-password',
                 });
                 if (resetError) {
                   setError('Error: ' + resetError.message);
