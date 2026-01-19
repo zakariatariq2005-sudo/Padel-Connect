@@ -69,12 +69,33 @@ export default function DashboardPage() {
 
       setUser(session.user);
 
-      // Get user profile
-      const { data: profileData } = await supabase
+      // Get user profile, create if doesn't exist
+      let { data: profileData, error: profileError } = await supabase
         .from('players')
         .select('*')
         .eq('user_id', session.user.id)
         .single();
+      
+      // If profile doesn't exist, create it
+      if (profileError || !profileData) {
+        const { data: newProfile, error: createError } = await supabase
+          .from('players')
+          .insert({
+            user_id: session.user.id,
+            name: session.user.email?.split('@')[0] || 'Player',
+            skill_level: 'Beginner',
+            location: 'Unknown',
+            is_online: false, // Start as offline, user can toggle
+          })
+          .select()
+          .single();
+        
+        if (createError) {
+          console.error('Error creating profile:', createError);
+        } else {
+          profileData = newProfile;
+        }
+      }
       
       setProfile(profileData);
 
