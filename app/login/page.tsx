@@ -131,6 +131,32 @@ export default function LoginPage() {
               Sign up
             </Link>
           </p>
+          
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Forgot your password?{' '}
+            <button
+              type="button"
+              onClick={async () => {
+                if (!email) {
+                  setError('Please enter your email address first');
+                  return;
+                }
+                const supabase = createClient();
+                const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+                  redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/reset-password` : undefined,
+                });
+                if (resetError) {
+                  setError('Error: ' + resetError.message);
+                } else {
+                  setError('');
+                  alert('Password reset email sent! Please check your inbox (and spam folder).');
+                }
+              }}
+              className="text-primary font-medium hover:underline"
+            >
+              Reset password
+            </button>
+          </p>
         </div>
       </div>
     </div>
