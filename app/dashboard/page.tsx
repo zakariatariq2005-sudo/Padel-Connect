@@ -12,6 +12,7 @@ import MatchFoundCard from '@/components/MatchFoundCard';
 import MatchRequestsSection from '@/components/MatchRequestsSection';
 import CommunityPulse from '@/components/CommunityPulse';
 import MobileNav from '@/components/MobileNav';
+import PlayerList from '@/components/PlayerList';
 
 /**
  * Dashboard Page - Intent-Driven Matchmaking
@@ -49,6 +50,9 @@ export default function DashboardPage() {
   // Community metrics
   const [playersLookingToday, setPlayersLookingToday] = useState(0);
   const [matchesThisWeek, setMatchesThisWeek] = useState(0);
+  
+  // Online players list
+  const [onlinePlayers, setOnlinePlayers] = useState<any[]>([]);
   
   const router = useRouter();
   const supabase = createClient();
@@ -156,6 +160,16 @@ export default function DashboardPage() {
       
       setMatchesThisWeek(matchesCount || 0);
 
+      // Load online players (excluding current user)
+      const { data: onlinePlayersData } = await supabase
+        .from('players')
+        .select('*')
+        .eq('is_online', true)
+        .neq('user_id', session.user.id)
+        .order('created_at', { ascending: false });
+
+      setOnlinePlayers(onlinePlayersData || []);
+
       setLoading(false);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -165,6 +179,46 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadDashboardData();
+
+    // Set up real-time subscription for online players
+    const playersChannel = supabase
+      .channel('online-players')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'players',
+          filter: 'is_online=eq.true',
+        },
+        () => {
+          // Reload online players when status changes
+          loadDashboardData();
+        }
+      )
+      .subscribe();
+
+    // Set up real-time subscription for match requests
+    const requestsChannel = supabase
+      .channel('match-requests')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'match_requests',
+        },
+        () => {
+          // Reload match requests when they change
+          loadDashboardData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(playersChannel);
+      supabase.removeChannel(requestsChannel);
+    };
   }, []);
 
   // Check for matches when play session is active
@@ -360,6 +414,22 @@ export default function DashboardPage() {
               outgoingRequests={outgoingRequests}
               onUpdate={handleRequestUpdate}
             />
+          </div>
+        )}
+
+        {/* 3.5. Online Players (if not in play session and players are online) */}
+        {!playSession && onlinePlayers.length > 0 && (
+          <div className="mb-6">
+            <div className="glass-card card-shadow p-5">
+              <h3 className="text-xl font-heading font-bold text-neutral mb-4 flex items-center gap-2">
+                <span className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></span>
+                Online Players ({onlinePlayers.length})
+              </h3>
+              <PlayerList 
+                players={onlinePlayers} 
+                currentUserId={user?.id || ''} 
+              />
+            </div>
           </div>
         )}
 

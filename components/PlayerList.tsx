@@ -33,9 +33,13 @@ export default function PlayerList({ players, currentUserId }: { players: any[];
         });
 
       if (error) {
-        alert(error.message);
+        if (error.code === '23505' || error.message.includes('unique')) {
+          alert('You already have a pending request with this player.');
+        } else {
+          alert(error.message || 'Failed to send match request');
+        }
       } else {
-        alert('Match request sent!');
+        alert('Match request sent! The player will see it in their dashboard.');
         router.refresh();
       }
     } catch (err) {

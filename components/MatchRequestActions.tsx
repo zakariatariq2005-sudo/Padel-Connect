@@ -49,6 +49,12 @@ export default function MatchRequestActions({
 
       if (matchError) throw matchError;
 
+      // Update the match request status to accepted (if not already)
+      await supabase
+        .from('match_requests')
+        .update({ status: 'accepted' })
+        .eq('id', requestId);
+
       router.push(`/match/${match.id}`);
     } catch (err: any) {
       alert(err.message || 'Failed to accept request');
