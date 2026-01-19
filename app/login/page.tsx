@@ -28,7 +28,12 @@ export default function LoginPage() {
       });
 
       if (signInError) {
-        setError(signInError.message);
+        // Check if error is due to unconfirmed email
+        if (signInError.message.includes('email') || signInError.message.includes('confirm') || signInError.message.includes('Invalid')) {
+          setError('Invalid credentials. If you just signed up, please check your email to confirm your account first.');
+        } else {
+          setError(signInError.message);
+        }
         setLoading(false);
         return;
       }
@@ -84,6 +89,29 @@ export default function LoginPage() {
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                 {error}
+                {error.includes('confirm') && email && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const supabase = createClient();
+                      const { error: resendError } = await supabase.auth.resend({
+                        type: 'signup',
+                        email: email,
+                        options: {
+                          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
+                        },
+                      });
+                      if (resendError) {
+                        setError('Error: ' + resendError.message);
+                      } else {
+                        setError('Confirmation email sent! Please check your inbox (and spam folder).');
+                      }
+                    }}
+                    className="mt-2 text-sm text-blue-600 hover:underline block"
+                  >
+                    Resend confirmation email
+                  </button>
+                )}
               </div>
             )}
 

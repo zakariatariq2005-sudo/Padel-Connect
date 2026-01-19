@@ -85,8 +85,7 @@ export default function SignupPage() {
         router.refresh();
       } else {
         // Email confirmation is required
-        // Create player profile using a database function or wait for confirmation
-        // For now, we'll create it anyway - it will be created when they confirm email
+        // Create player profile - it will be activated when they confirm email
         const { error: profileError } = await supabase
           .from('players')
           .insert({
@@ -98,14 +97,37 @@ export default function SignupPage() {
           });
 
         if (profileError) {
-          // If profile creation fails, still show success message for signup
-          // The profile can be created on first login
           console.error('Profile creation error:', profileError);
         }
 
+        // Show success message with resend option
         setError(null);
         setLoading(false);
-        alert('Account created! Please check your email to confirm your account, then log in.');
+        
+        // Store email for resend functionality
+        const userEmail = formData.email;
+        
+        // Show message with resend button
+        const resendConfirmation = async () => {
+          const { error: resendError } = await supabase.auth.resend({
+            type: 'signup',
+            email: userEmail,
+            options: {
+              emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
+            },
+          });
+          
+          if (resendError) {
+            alert('Error resending email: ' + resendError.message);
+          } else {
+            alert('Confirmation email sent! Please check your inbox (and spam folder).');
+          }
+        };
+        
+        // Auto-resend once
+        await resendConfirmation();
+        
+        alert('Account created! A confirmation email has been sent. Please check your inbox (and spam folder) to confirm your account, then log in.\n\nIf you don\'t receive the email, you can resend it from the login page.');
         router.push('/login');
       }
     } catch (err) {
