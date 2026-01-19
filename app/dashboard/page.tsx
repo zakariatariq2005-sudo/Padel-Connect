@@ -161,12 +161,16 @@ export default function DashboardPage() {
       setMatchesThisWeek(matchesCount || 0);
 
       // Load online players (excluding current user)
-      const { data: onlinePlayersData } = await supabase
+      const { data: onlinePlayersData, error: playersError } = await supabase
         .from('players')
         .select('*')
         .eq('is_online', true)
         .neq('user_id', session.user.id)
         .order('created_at', { ascending: false });
+
+      if (playersError) {
+        console.error('Error loading online players:', playersError);
+      }
 
       setOnlinePlayers(onlinePlayersData || []);
 
@@ -417,18 +421,25 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* 3.5. Online Players (if not in play session and players are online) */}
-        {!playSession && onlinePlayers.length > 0 && (
+        {/* 3.5. Online Players (if not in play session) */}
+        {!playSession && (
           <div className="mb-6">
             <div className="glass-card card-shadow p-5">
               <h3 className="text-xl font-heading font-bold text-neutral mb-4 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></span>
-                Online Players ({onlinePlayers.length})
+                Online Players {onlinePlayers.length > 0 && `(${onlinePlayers.length})`}
               </h3>
-              <PlayerList 
-                players={onlinePlayers} 
-                currentUserId={user?.id || ''} 
-              />
+              {onlinePlayers.length > 0 ? (
+                <PlayerList 
+                  players={onlinePlayers} 
+                  currentUserId={user?.id || ''} 
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-400 mb-2">No other players online right now</p>
+                  <p className="text-sm text-gray-500">Make sure you're online (toggle in top right) and other players are also online to see them here.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
