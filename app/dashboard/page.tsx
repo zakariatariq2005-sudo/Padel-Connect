@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 import LogoutButton from '@/components/LogoutButton';
 import OnlineToggle from '@/components/OnlineToggle';
 import PlayerList from '@/components/PlayerList';
-import DashboardAuthGuard from '@/components/DashboardAuthGuard';
 import Link from 'next/link';
 
 /**
@@ -36,8 +35,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <DashboardAuthGuard>
-      <div className="min-h-screen bg-dark">
+    <div className="min-h-screen bg-dark">
       {/* Header */}
       <header className="bg-neutral border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
