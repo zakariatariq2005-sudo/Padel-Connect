@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { loginAction } from '@/app/actions/login';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -10,30 +10,73 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('password', password);
-
     try {
-      const result = await loginAction(formData);
-      if (result && !result.success) {
-        setError(result.error || 'Login failed');
+      const supabase = createClient();
+      
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        if (signInError.message.includes('email') || signInError.message.includes('confirm') || signInError.message.includes('Invalid')) {
+          setError('Invalid credentials. If you just signed up, please check your email to confirm your account first.');
+        } else {
+          setError(signInError.message);
+        }
         setLoading(false);
-      }
-      // If successful, redirect happens in the server action
-    } catch (err) {
-      // Redirect throws an error, which is expected
-      if (err && typeof err === 'object' && 'digest' in err) {
-        // This is a Next.js redirect, ignore it
         return;
       }
-      setError('An unexpected error occurred');
+
+      if (!authData.session || !authData.user) {
+        setError('Login failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Update player online status
+      try {
+        await supabase
+          .from('players')
+          .update({ is_online: true })
+          .eq('user_id', authData.user.id);
+      } catch (profileError) {
+        await supabase
+          .from('players')
+          .insert({
+            user_id: authData.user.id,
+            name: authData.user.email?.split('@')[0] || 'Player',
+            skill_level: 'Beginner',
+            location: 'Unknown',
+            is_online: true,
+          });
+      }
+
+      // Wait for session to be fully established
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Verify session exists
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setError('Session not established. Please try again.');
+        setLoading(false);
+        return;
+      }
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
+      router.refresh();
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+      setError('An unexpected error occurred: ' + errorMsg);
       setLoading(false);
     }
   }
@@ -87,7 +130,6 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={async () => {
-                      const supabase = createClient();
                       const { error: resendError } = await supabase.auth.resend({
                         type: 'signup',
                         email: email,
@@ -135,7 +177,6 @@ export default function LoginPage() {
                   setError('Please enter your email address first');
                   return;
                 }
-                const supabase = createClient();
                 const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
                   redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/reset-password` : 'https://padel-connect-cyan.vercel.app/reset-password',
                 });

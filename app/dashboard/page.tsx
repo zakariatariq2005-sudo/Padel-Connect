@@ -1,37 +1,98 @@
-import { redirect } from 'next/navigation';
-import { requireAuth, getUserProfile } from '@/lib/auth';
-import { createClient } from '@/lib/supabase/server';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import LogoutButton from '@/components/LogoutButton';
 import OnlineToggle from '@/components/OnlineToggle';
 import PlayerList from '@/components/PlayerList';
 import Link from 'next/link';
 
 /**
- * Dashboard Page (Server Component)
+ * Dashboard Page (Client Component)
  * 
- * This is the main page users see after logging in. It displays:
- * - A list of all online players
- * - Each player's name, skill level, and location
- * - A "Request Match" button for each player
- * 
- * Only authenticated users can access this page.
+ * Checks auth client-side first to avoid cookie sync issues,
+ * then loads data once authenticated.
  */
-export default async function DashboardPage() {
-  // This will redirect to /login if not authenticated
-  const user = await requireAuth();
-  const profile = await getUserProfile();
-  
-  // Get all online players (excluding the current user)
-  const supabase = await createClient();
-  const { data: players, error } = await supabase
-    .from('players')
-    .select('*')
-    .eq('is_online', true)
-    .neq('user_id', user.id)
-    .order('name', { ascending: true });
+export default function DashboardPage() {
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [players, setPlayers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const supabase = createClient();
 
-  if (error) {
-    console.error('Error fetching players:', error);
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        // Check auth client-side
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !authUser) {
+          router.push('/login');
+          return;
+        }
+
+        setUser(authUser);
+
+        // Load profile
+        const { data: profileData, error: profileError } = await supabase
+          .from('players')
+          .select('*')
+          .eq('user_id', authUser.id)
+          .single();
+
+        if (profileError || !profileData) {
+          // Create profile if doesn't exist
+          const { data: newProfile } = await supabase
+            .from('players')
+            .insert({
+              user_id: authUser.id,
+              name: authUser.email?.split('@')[0] || 'Player',
+              skill_level: 'Beginner',
+              location: 'Unknown',
+              is_online: true,
+            })
+            .select()
+            .single();
+          
+          setProfile(newProfile || null);
+        } else {
+          setProfile(profileData);
+        }
+
+        // Load online players
+        const { data: playersData } = await supabase
+          .from('players')
+          .select('*')
+          .eq('is_online', true)
+          .neq('user_id', authUser.id)
+          .order('name', { ascending: true });
+
+        setPlayers(playersData || []);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        router.push('/login');
+      }
+    };
+
+    loadDashboard();
+  }, [router, supabase]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-dark flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-neutral text-lg font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Router will handle redirect
   }
 
   return (
@@ -95,5 +156,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-
-
