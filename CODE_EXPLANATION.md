@@ -1,6 +1,6 @@
-# Code Explanation - Impero Sport
+# Code Explanation - PadelConnect
 
-This document explains all the code in the Impero Sport application in simple terms, making it easy to understand how everything works.
+This document explains all the code in the PadelConnect application in simple terms, making it easy to understand how everything works.
 
 ## Table of Contents
 

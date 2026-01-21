@@ -1,5 +1,5 @@
 ═══════════════════════════════════════════════════════════════
-  IMPERO SPORT - COMPLETE PROJECT PACKAGE
+  PADELCONNECT - COMPLETE PROJECT PACKAGE
 ═══════════════════════════════════════════════════════════════
 
 📦 PACKAGE CONTENTS

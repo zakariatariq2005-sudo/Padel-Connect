@@ -7,18 +7,11 @@ import { createClient } from '@/lib/supabase/client';
 /**
  * Match Request Actions Component
  * 
- * Premium Accept/Reject buttons for incoming match requests.
- * When accepted, creates a match and redirects to live match page.
+ * Provides Accept and Reject buttons for incoming match requests.
+ * When a request is accepted, a match is created and both players
+ * are redirected to the live match page.
  */
-export default function MatchRequestActions({ 
-  requestId, 
-  senderId,
-  onUpdate 
-}: { 
-  requestId: string; 
-  senderId: string;
-  onUpdate?: () => void;
-}) {
+export default function MatchRequestActions({ requestId, senderId }: { requestId: string; senderId: string }) {
   const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState<'accept' | 'reject' | null>(null);
@@ -27,9 +20,11 @@ export default function MatchRequestActions({
     setLoading('accept');
 
     try {
+      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Update request status to accepted
       const { error: updateError } = await supabase
         .from('match_requests')
         .update({ status: 'accepted' })
@@ -37,6 +32,7 @@ export default function MatchRequestActions({
 
       if (updateError) throw updateError;
 
+      // Create a match record
       const { data: match, error: matchError } = await supabase
         .from('matches')
         .insert({
@@ -49,15 +45,11 @@ export default function MatchRequestActions({
 
       if (matchError) throw matchError;
 
-      // Update the match request status to accepted (if not already)
-      await supabase
-        .from('match_requests')
-        .update({ status: 'accepted' })
-        .eq('id', requestId);
-
+      // Redirect to live match page
       router.push(`/match/${match.id}`);
     } catch (err: any) {
       alert(err.message || 'Failed to accept request');
+    } finally {
       setLoading(null);
     }
   };
@@ -73,11 +65,7 @@ export default function MatchRequestActions({
 
       if (error) throw error;
 
-      if (onUpdate) {
-        onUpdate();
-      } else {
-        router.refresh();
-      }
+      router.refresh();
     } catch (err: any) {
       alert(err.message || 'Failed to reject request');
     } finally {
@@ -90,20 +78,18 @@ export default function MatchRequestActions({
       <button
         onClick={handleAccept}
         disabled={loading !== null}
-        className="btn-secondary text-sm px-4 py-2"
+        className="bg-secondary text-neutral font-medium py-1.5 px-4 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
       >
         {loading === 'accept' ? 'Accepting...' : 'Accept'}
       </button>
       <button
         onClick={handleReject}
         disabled={loading !== null}
-        className="px-4 py-2 bg-dark-lighter text-gray-300 font-semibold rounded-xl 
-                 hover:bg-dark-lighter/80 border border-white/10
-                 transition-all duration-200 active:scale-95
-                 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+        className="bg-gray-200 text-dark font-medium py-1.5 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
       >
         {loading === 'reject' ? 'Rejecting...' : 'Reject'}
       </button>
     </div>
   );
 }
+

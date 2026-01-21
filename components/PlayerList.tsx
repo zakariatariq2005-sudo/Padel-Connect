@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { sendMatchRequest } from '@/app/actions/matchmaking';
 
 /**
  * Player List Component
@@ -13,40 +13,26 @@ import { useRouter } from 'next/navigation';
  * - Skill level
  * - Location
  * - A "Request Match" button
+ * 
+ * Uses Server Actions to enforce business rules server-side.
  */
 export default function PlayerList({ players, currentUserId }: { players: any[]; currentUserId: string }) {
   const [requesting, setRequesting] = useState<string | null>(null);
-  const supabase = createClient();
   const router = useRouter();
 
   const handleRequestMatch = async (playerId: string) => {
     setRequesting(playerId);
 
-    try {
-      // Create a match request
-      const { error } = await supabase
-        .from('match_requests')
-        .insert({
-          sender_id: currentUserId,
-          receiver_id: playerId,
-          status: 'pending',
-        });
+    const result = await sendMatchRequest(playerId);
 
-      if (error) {
-        if (error.code === '23505' || error.message.includes('unique')) {
-          alert('You already have a pending request with this player.');
-        } else {
-          alert(error.message || 'Failed to send match request');
-        }
-      } else {
-        alert('Match request sent! The player will see it in their dashboard.');
-        router.refresh();
-      }
-    } catch (err) {
-      alert('Failed to send match request');
-    } finally {
-      setRequesting(null);
+    if (!result.success) {
+      alert(result.error || 'Failed to send match request');
+    } else {
+      alert('Match request sent!');
+      router.refresh();
     }
+
+    setRequesting(null);
   };
 
   return (

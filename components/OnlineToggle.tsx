@@ -2,55 +2,74 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { toggleOnlineStatus } from '@/app/actions/matchmaking';
+import { useRouter } from 'next/navigation';
 
 /**
  * Online Toggle Component
  * 
  * Allows users to toggle their online/offline status.
- * Updates the `is_online` field in the players table.
- * Premium design with smooth animations.
+ * Only online users can send and receive match requests.
  */
-export default function OnlineToggle({ initialStatus, onStatusChange }: { 
-  initialStatus: boolean;
-  onStatusChange?: () => void;
-}) {
+export default function OnlineToggle({ initialStatus }: { initialStatus: boolean }) {
   const [isOnline, setIsOnline] = useState(initialStatus);
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
+  const router = useRouter();
 
+  // Sync with real-time updates
   useEffect(() => {
-    setIsOnline(initialStatus);
-  }, [initialStatus]);
+    let mounted = true;
+
+    const setupChannel = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !mounted) return;
+
+      const channel = supabase
+        .channel(`online-status-${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'players',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            if (mounted && payload.new.is_online !== undefined) {
+              setIsOnline(payload.new.is_online as boolean);
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
+    const cleanup = setupChannel();
+
+    return () => {
+      mounted = false;
+      cleanup.then(cleanupFn => cleanupFn && cleanupFn());
+    };
+  }, [supabase]);
 
   const handleToggle = async () => {
     setLoading(true);
+    const newStatus = !isOnline;
     
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const newStatus = !isOnline;
-      
-      const { error } = await supabase
-        .from('players')
-        .update({ is_online: newStatus })
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error updating online status:', error);
-        alert('Failed to update status');
-      } else {
-        setIsOnline(newStatus);
-        if (onStatusChange) {
-          onStatusChange();
-        }
-      }
-    } catch (err) {
-      console.error('Error:', err);
-      alert('Failed to update status');
-    } finally {
-      setLoading(false);
+    const result = await toggleOnlineStatus(newStatus);
+    
+    if (result.success) {
+      setIsOnline(newStatus);
+      router.refresh();
+    } else {
+      alert(result.error || 'Failed to update online status');
     }
+    
+    setLoading(false);
   };
 
   return (
@@ -58,20 +77,23 @@ export default function OnlineToggle({ initialStatus, onStatusChange }: {
       onClick={handleToggle}
       disabled={loading}
       className={`
-        relative flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm
-        transition-all duration-300 transform active:scale-95
+        relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+        focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
         disabled:opacity-50 disabled:cursor-not-allowed
         ${isOnline 
-          ? 'bg-gradient-to-r from-secondary to-green-400 text-white shadow-lg shadow-secondary/30' 
-          : 'bg-dark-lighter text-gray-400 border border-white/10 hover:border-white/20'
+          ? 'bg-secondary' 
+          : 'bg-gray-300'
         }
       `}
+      aria-label={isOnline ? 'Go offline' : 'Go online'}
     >
-      <span className={`
-        w-2.5 h-2.5 rounded-full transition-all duration-300
-        ${isOnline ? 'bg-white animate-pulse' : 'bg-gray-500'}
-      `} />
-      {loading ? 'Updating...' : isOnline ? 'Online' : 'Offline'}
+      <span
+        className={`
+          inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+          ${isOnline ? 'translate-x-6' : 'translate-x-1'}
+        `}
+      />
+      <span className="sr-only">{isOnline ? 'Online' : 'Offline'}</span>
     </button>
   );
 }

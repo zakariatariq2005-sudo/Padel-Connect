@@ -32,28 +32,12 @@ export default function SignupPage() {
 
     try {
       // Create the user account with email and password
-      const emailRedirectTo = typeof window !== 'undefined' 
-        ? `${window.location.origin}/dashboard`
-        : undefined;
-      
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
-        ...(emailRedirectTo && {
-          options: {
-            emailRedirectTo,
-          },
-        }),
       });
 
       if (signUpError) {
-        // Check if user already exists
-        if (signUpError.message.includes('already registered') || signUpError.message.includes('already exists')) {
-          setError('An account with this email already exists. Please log in instead.');
-          setLoading(false);
-          setTimeout(() => router.push('/login'), 2000);
-          return;
-        }
         setError(signUpError.message);
         setLoading(false);
         return;
@@ -65,131 +49,26 @@ export default function SignupPage() {
         return;
       }
 
-      // Check if email confirmation is required
-      // If session exists, user is automatically logged in (email confirmation disabled)
-      // If no session, email confirmation is required
-      if (authData.session) {
-        // User is automatically logged in (email confirmation disabled)
-        // Check if profile already exists
-        const { data: existingProfile } = await supabase
-          .from('players')
-          .select('id')
-          .eq('user_id', authData.user.id)
-          .single();
+      // Create the player profile in our database
+      const { error: profileError } = await supabase
+        .from('players')
+        .insert({
+          user_id: authData.user.id,
+          name: formData.name,
+          skill_level: formData.skillLevel,
+          location: formData.location,
+          is_online: true,
+        });
 
-        if (existingProfile) {
-          // Profile already exists, just update it and redirect
-          await supabase
-            .from('players')
-            .update({
-              name: formData.name,
-              skill_level: formData.skillLevel,
-              location: formData.location,
-              is_online: true,
-            })
-            .eq('user_id', authData.user.id);
-          
-          router.push('/dashboard');
-          router.refresh();
-          return;
-        }
-
-        // Create the player profile in our database
-        const { error: profileError } = await supabase
-          .from('players')
-          .insert({
-            user_id: authData.user.id,
-            name: formData.name,
-            skill_level: formData.skillLevel,
-            location: formData.location,
-            is_online: true,
-          });
-
-        if (profileError) {
-          // If profile already exists (unique constraint), try to update it
-          if (profileError.code === '23505' || profileError.message.includes('unique')) {
-            await supabase
-              .from('players')
-              .update({
-                name: formData.name,
-                skill_level: formData.skillLevel,
-                location: formData.location,
-                is_online: true,
-              })
-              .eq('user_id', authData.user.id);
-            
-            router.push('/dashboard');
-            router.refresh();
-            return;
-          }
-          
-          setError('Account created but failed to create profile. Please try logging in.');
-          setLoading(false);
-          return;
-        }
-
-        // Redirect to dashboard on success
-        router.push('/dashboard');
-        router.refresh();
-      } else {
-        // Email confirmation is required
-        // Check if profile already exists
-        const { data: existingProfile } = await supabase
-          .from('players')
-          .select('id')
-          .eq('user_id', authData.user.id)
-          .single();
-
-        if (!existingProfile) {
-          // Create player profile - it will be activated when they confirm email
-          const { error: profileError } = await supabase
-            .from('players')
-            .insert({
-              user_id: authData.user.id,
-              name: formData.name,
-              skill_level: formData.skillLevel,
-              location: formData.location,
-              is_online: false, // Set to false until they confirm and log in
-            });
-
-          if (profileError) {
-            // If profile already exists, just log it
-            if (profileError.code !== '23505' && !profileError.message.includes('unique')) {
-              console.error('Profile creation error:', profileError);
-            }
-          }
-        }
-
-        // Show success message with resend option
-        setError(null);
+      if (profileError) {
+        setError('Account created but failed to create profile. Please try logging in.');
         setLoading(false);
-        
-        // Store email for resend functionality
-        const userEmail = formData.email;
-        
-        // Show message with resend button
-        const resendConfirmation = async () => {
-          const { error: resendError } = await supabase.auth.resend({
-            type: 'signup',
-            email: userEmail,
-            options: {
-              emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
-            },
-          });
-          
-          if (resendError) {
-            alert('Error resending email: ' + resendError.message);
-          } else {
-            alert('Confirmation email sent! Please check your inbox (and spam folder).');
-          }
-        };
-        
-        // Auto-resend once
-        await resendConfirmation();
-        
-        alert('Account created! A confirmation email has been sent. Please check your inbox (and spam folder) to confirm your account, then log in.\n\nIf you don\'t receive the email, you can resend it from the login page.');
-        router.push('/login');
+        return;
       }
+
+      // Redirect to dashboard on success
+      router.push('/dashboard');
+      router.refresh();
     } catch (err) {
       setError('An unexpected error occurred');
       setLoading(false);
@@ -201,7 +80,7 @@ export default function SignupPage() {
       <div className="w-full max-w-md">
         <div className="bg-neutral rounded-lg shadow-xl p-8">
           <h1 className="text-3xl font-heading font-bold text-primary mb-2 text-center">
-            Padel Connect
+            PadelConnect
           </h1>
           <p className="text-gray-600 text-center mb-8">Create your account to start playing</p>
 
@@ -216,7 +95,7 @@ export default function SignupPage() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                 placeholder="John Doe"
               />
             </div>
@@ -231,7 +110,7 @@ export default function SignupPage() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                 placeholder="you@example.com"
               />
             </div>
@@ -247,7 +126,7 @@ export default function SignupPage() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
                 minLength={6}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                 placeholder="••••••••"
               />
             </div>
@@ -261,7 +140,7 @@ export default function SignupPage() {
                 value={formData.skillLevel}
                 onChange={(e) => setFormData({ ...formData, skillLevel: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
               >
                 <option value="Beginner">Beginner</option>
                 <option value="Intermediate">Intermediate</option>
@@ -280,7 +159,7 @@ export default function SignupPage() {
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
                 placeholder="City, Country"
               />
             </div>

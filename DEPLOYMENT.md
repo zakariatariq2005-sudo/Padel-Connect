@@ -1,6 +1,6 @@
-# Deploying Impero Sport to Vercel
+# Deploying PadelConnect to Vercel
 
-This guide will walk you through deploying your Impero Sport app to Vercel, making it accessible to everyone on the internet!
+This guide will walk you through deploying your PadelConnect app to Vercel, making it accessible to everyone on the internet!
 
 ## What You'll Need
 
@@ -43,7 +43,7 @@ git add .
 ### 1.3 Create Your First Commit
 
 ```bash
-git commit -m "Initial commit: Impero Sport app"
+git commit -m "Initial commit: PadelConnect app"
 ```
 
 **What this does**: Saves a snapshot of your code. Think of it like a checkpoint you can return to.
@@ -58,7 +58,7 @@ git commit -m "Initial commit: Impero Sport app"
 2. Click the **"+"** icon in the top right corner
 3. Select **"New repository"**
 4. Fill in the details:
-   - **Repository name**: `clay tennisconnect` (or any name you like)
+   - **Repository name**: `padelconnect` (or any name you like)
    - **Description**: "Padel player matching app"
    - **Visibility**: Choose **Public** (free) or **Private** (if you have GitHub Pro)
    - **DO NOT** check "Initialize with README" (we already have one)
@@ -70,7 +70,7 @@ git commit -m "Initial commit: Impero Sport app"
 GitHub will show you some commands. Use the "push an existing repository" option:
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/clay tennisconnect.git
+git remote add origin https://github.com/YOUR_USERNAME/padelconnect.git
 git branch -M main
 git push -u origin main
 ```
@@ -105,7 +105,7 @@ You'll be prompted to enter your GitHub username and password (or a personal acc
 1. After signing in, you'll see the Vercel dashboard
 2. Click **"Add New..."** → **"Project"**
 3. You'll see a list of your GitHub repositories
-4. Find **"clay tennisconnect"** (or whatever you named it) and click **"Import"**
+4. Find **"padelconnect"** (or whatever you named it) and click **"Import"**
 
 ### 3.3 Configure Project Settings
 
@@ -170,7 +170,7 @@ After adding the environment variables:
 ## Step 5: Test Your Deployed App
 
 1. Once the deployment finishes, click the deployment
-2. You'll see a URL like `https://clay tennisconnect.vercel.app`
+2. You'll see a URL like `https://padelconnect.vercel.app`
 3. Click the URL to open your live app!
 4. Try signing up a new account - it should work!
 
@@ -263,7 +263,7 @@ All of this happens automatically in about 2-5 minutes!
 
 ### Custom Domain (Optional)
 
-Want your own domain like `clay tennisconnect.com`?
+Want your own domain like `padelconnect.com`?
 
 1. In Vercel project settings, go to **"Domains"**
 2. Add your domain
@@ -310,6 +310,6 @@ Vercel provides analytics and monitoring:
 - **Supabase Docs**: https://supabase.com/docs
 - **Check your code comments**: All code has detailed explanations!
 
-Congratulations! Your Impero Sport app is now live on the internet! 🎉
+Congratulations! Your PadelConnect app is now live on the internet! 🎉
 
 
