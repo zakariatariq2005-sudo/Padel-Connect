@@ -24,7 +24,7 @@ export default function Header({
               <span 
                 className="bg-clip-text text-transparent"
                 style={{ 
-                  backgroundImage: 'linear-gradient(to right, #22C55E, #14b8a6)'
+                  backgroundImage: 'linear-gradient(to right, #3B82F6, #14b8a6)'
                 }}
               >
                 Padel
