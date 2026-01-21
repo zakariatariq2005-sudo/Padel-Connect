@@ -43,6 +43,7 @@ export default function RequestsDashboard({
   const [incomingRequests, setIncomingRequests] = useState(initialIncoming);
   const [outgoingRequests, setOutgoingRequests] = useState(initialOutgoing);
   const [matches, setMatches] = useState(initialMatches);
+  const [stats, setStats] = useState(initialStats);
   const [loading, setLoading] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'incoming' | 'outgoing' | 'matches'>('incoming');
   const supabase = createClient();
@@ -93,7 +94,8 @@ export default function RequestsDashboard({
     setIncomingRequests(initialIncoming);
     setOutgoingRequests(initialOutgoing);
     setMatches(initialMatches);
-  }, [initialIncoming, initialOutgoing, initialMatches]);
+    setStats(initialStats);
+  }, [initialIncoming, initialOutgoing, initialMatches, initialStats]);
 
   const handleAccept = async (requestId: string) => {
     setLoading(`accept-${requestId}`);

@@ -74,7 +74,6 @@ export default function MatchRequestsSection({
                   <MatchRequestActions
                     requestId={request.id}
                     senderId={request.sender_id}
-                    onUpdate={onUpdate}
                   />
                 </div>
               </div>
