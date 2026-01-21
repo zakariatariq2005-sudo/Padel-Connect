@@ -16,15 +16,15 @@ export default function PlayerCard({
   isRequesting: boolean;
 }) {
   return (
-    <div className="bg-neutral rounded-lg shadow-lg p-5 hover:shadow-xl transition-shadow border border-gray-200">
+    <div className="bg-dark-light rounded-lg shadow-lg p-5 hover:shadow-xl transition-shadow border border-dark-lighter text-center">
       <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-heading font-semibold text-dark">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <h3 className="text-lg font-heading font-semibold text-neutral">
             {player.name}
           </h3>
           <span className="w-2 h-2 bg-secondary rounded-full" title="Online"></span>
         </div>
-        <div className="space-y-1 text-sm text-gray-600">
+        <div className="space-y-1 text-sm text-gray-300">
           <p>
             <span className="font-medium">Skill:</span> {player.skill_level}
           </p>

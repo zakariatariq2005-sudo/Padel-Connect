@@ -157,13 +157,11 @@ export default function DashboardPage() {
               {outgoingRequests.map((request) => (
                 <div
                   key={request.id}
-                  className="bg-neutral rounded-lg shadow p-5 border border-gray-200 flex justify-between items-center"
+                  className="bg-dark-light rounded-lg shadow p-5 border border-dark-lighter text-center"
                 >
-                  <div>
-                    <p className="font-medium text-dark">
-                      You requested to play with {request.receiver?.name || 'Unknown Player'}
-                    </p>
-                  </div>
+                  <p className="font-medium text-neutral mb-2">
+                    You requested to play with {request.receiver?.name || 'Unknown Player'}
+                  </p>
                   <span className="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
                     Pending
                   </span>
@@ -192,12 +190,12 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-neutral rounded-lg shadow p-8">
-              <p className="text-gray-600 text-center mb-2">No other players online right now</p>
-              <p className="text-sm text-gray-500 text-center mb-4">
+            <div className="bg-dark-light rounded-lg shadow p-8 border border-dark-lighter text-center">
+              <p className="text-gray-300 text-center mb-2">No other players online right now</p>
+              <p className="text-sm text-gray-400 text-center mb-4">
                 Make sure you're online (toggle in top right) and other players are also online to see them here.
               </p>
-              <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
+              <div className="mt-4 p-3 bg-dark-lighter rounded text-xs text-gray-400">
                 <p>Debug info: Your user ID is {user.id?.substring(0, 8)}...</p>
                 <p>Online players count: {players.length}</p>
               </div>

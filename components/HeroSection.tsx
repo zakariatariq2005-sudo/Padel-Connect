@@ -30,7 +30,7 @@ export default function HeroSection({ isOnline }: { isOnline: boolean }) {
   };
 
   return (
-    <div className="bg-dark-light rounded-lg shadow-lg p-6 md:p-8 mb-8 border border-dark-lighter">
+    <div className="bg-dark-light rounded-lg shadow-lg p-6 md:p-8 mb-8 border border-dark-lighter text-center">
       <h2 className="text-3xl md:text-4xl font-heading font-bold text-neutral mb-3">
         Ready to play padel?
       </h2>
