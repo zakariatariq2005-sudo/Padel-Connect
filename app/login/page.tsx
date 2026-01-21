@@ -67,8 +67,16 @@ export default function LoginPage() {
           });
       }
 
-      // Wait briefly for session to sync
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Wait for session to be fully established and cookies to be set
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Verify session one more time
+      const { data: { session: finalSession } } = await supabase.auth.getSession();
+      if (!finalSession) {
+        setError('Session not established. Please try again.');
+        setLoading(false);
+        return;
+      }
       
       // Use window.location for a full page reload to ensure cookies are synced
       window.location.href = '/dashboard';

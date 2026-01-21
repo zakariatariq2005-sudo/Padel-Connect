@@ -6,6 +6,8 @@ import { createBrowserClient } from '@supabase/ssr';
  * 
  * The SUPABASE_URL and SUPABASE_ANON_KEY should be stored in your .env.local file
  * for security. Never commit these values to version control.
+ * 
+ * createBrowserClient automatically handles cookie-based session management.
  */
 export function createClient() {
   return createBrowserClient(
