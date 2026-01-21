@@ -29,11 +29,21 @@ export async function getUser() {
  * Returns the authenticated user if successful.
  */
 export async function requireAuth() {
-  const user = await getUser();
-  if (!user) {
+  try {
+    const supabase = await createClient();
+    
+    // Try to get user with session refresh
+    const { data: { user }, error } = await supabase.auth.getUser();
+    
+    if (error || !user) {
+      redirect('/login');
+    }
+    
+    return user;
+  } catch (error) {
+    // If there's any error, redirect to login
     redirect('/login');
   }
-  return user;
 }
 
 /**

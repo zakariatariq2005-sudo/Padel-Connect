@@ -69,25 +69,23 @@ export default function LoginPage() {
         }
       }
 
-      // Wait for session to sync and verify it's set
-      let sessionVerified = false;
-      for (let i = 0; i < 10; i++) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          sessionVerified = true;
-          break;
-        }
-      }
+      // Wait a moment for cookies to be set by the browser
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (!sessionVerified) {
+      // Verify session is set
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
         setError('Session not established. Please try again.');
         setLoading(false);
         return;
       }
       
-      // Use window.location to force a full page reload and ensure cookies are synced
-      window.location.href = '/dashboard';
+      // Redirect using router with a small delay to ensure cookies are sent
+      router.push('/dashboard');
+      // Also refresh to ensure server-side gets the cookies
+      setTimeout(() => {
+        router.refresh();
+      }, 100);
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';
       setError('An unexpected error occurred: ' + errorMsg);
