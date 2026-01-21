@@ -5,15 +5,14 @@ import OnlineToggle from './OnlineToggle';
 /**
  * Header Component
  * 
- * Fixed header with app name, online status toggle, and status indicator.
- * Uses existing OnlineToggle component - does not reimplement toggle logic.
+ * Fixed header matching the exact design from the image:
+ * - "PadelConnect" in teal on left
+ * - "Offline"/"Online" button with toggle on right
  */
 export default function Header({ 
-  isOnline, 
-  userName 
+  isOnline
 }: { 
   isOnline: boolean;
-  userName?: string;
 }) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-dark-lighter/95 backdrop-blur-lg border-b border-white/10">
@@ -21,21 +20,20 @@ export default function Header({
         <div className="flex justify-between items-center h-16">
           {/* App Name - Left */}
           <div>
-            <h1 className="text-xl font-heading font-bold text-primary">PadelConnect</h1>
+            <h1 className="text-xl font-heading font-bold" style={{ color: '#14b8a6' }}>PadelConnect</h1>
           </div>
 
           {/* Online Status - Right */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className={`text-sm ${isOnline ? 'text-secondary' : 'text-gray-400'}`}>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-dark-lighter transition">
+              <span className={`text-sm font-medium ${isOnline ? 'text-secondary' : 'text-gray-400'}`}>
                 {isOnline ? 'Online' : 'Offline'}
               </span>
               <OnlineToggle initialStatus={isOnline} />
-            </div>
+            </button>
           </div>
         </div>
       </div>
     </header>
   );
 }
-

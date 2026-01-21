@@ -12,13 +12,16 @@ import PlayerCard from '@/components/PlayerCard';
 /**
  * Dashboard Page - Players
  * 
- * Main page showing online players and matchmaking interface.
- * All existing logic preserved - only UI structure rebuilt.
+ * Matches exact design from image with:
+ * - Hero section
+ * - Your Match Requests section (with green bar)
+ * - Online Players section (with green bar and debug info)
  */
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [players, setPlayers] = useState<any[]>([]);
+  const [outgoingRequests, setOutgoingRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState<string | null>(null);
   const router = useRouter();
@@ -72,6 +75,29 @@ export default function DashboardPage() {
           .order('name', { ascending: true });
 
         setPlayers(playersData || []);
+
+        // Load outgoing requests
+        const { data: outgoingData } = await supabase
+          .from('match_requests')
+          .select('*')
+          .eq('sender_id', authUser.id)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false });
+
+        // Fetch receiver profiles
+        const receiverIds = (outgoingData || []).map((r: any) => r.receiver_id);
+        const { data: receiversData } = await supabase
+          .from('players')
+          .select('*')
+          .in('user_id', receiverIds);
+
+        const receiversMap = new Map((receiversData || []).map((p: any) => [p.user_id, p]));
+
+        setOutgoingRequests((outgoingData || []).map((r: any) => ({
+          ...r,
+          receiver: receiversMap.get(r.receiver_id),
+        })));
+
         setLoading(false);
       } catch (error) {
         console.error('Error loading dashboard:', error);
@@ -113,15 +139,44 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-dark pb-20 md:pb-0">
-      <Header isOnline={profile?.is_online || false} userName={profile?.name} />
+      <Header isOnline={profile?.is_online || false} />
 
       <main className="pt-20 px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         {/* Hero Section */}
         <HeroSection isOnline={profile?.is_online || false} />
 
+        {/* Your Match Requests Section */}
+        {outgoingRequests.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-2xl font-heading font-bold text-neutral mb-4 flex items-center gap-2">
+              <span className="w-1 h-6 bg-secondary rounded-full"></span>
+              Your Match Requests
+            </h2>
+            
+            <div className="space-y-3">
+              {outgoingRequests.map((request) => (
+                <div
+                  key={request.id}
+                  className="bg-neutral rounded-lg shadow p-5 border border-gray-200 flex justify-between items-center"
+                >
+                  <div>
+                    <p className="font-medium text-dark">
+                      You requested to play with {request.receiver?.name || 'Unknown Player'}
+                    </p>
+                  </div>
+                  <span className="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                    Pending
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Online Players Section */}
         <section className="mb-8">
-          <h2 className="text-2xl font-heading font-bold text-neutral mb-4">
+          <h2 className="text-2xl font-heading font-bold text-neutral mb-4 flex items-center gap-2">
+            <span className="w-1 h-6 bg-secondary rounded-full"></span>
             Online Players
           </h2>
           
@@ -137,8 +192,15 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-neutral rounded-lg shadow p-8 text-center">
-              <p className="text-gray-600">No other players online right now</p>
+            <div className="bg-neutral rounded-lg shadow p-8">
+              <p className="text-gray-600 text-center mb-2">No other players online right now</p>
+              <p className="text-sm text-gray-500 text-center mb-4">
+                Make sure you're online (toggle in top right) and other players are also online to see them here.
+              </p>
+              <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
+                <p>Debug info: Your user ID is {user.id?.substring(0, 8)}...</p>
+                <p>Online players count: {players.length}</p>
+              </div>
             </div>
           )}
         </section>
