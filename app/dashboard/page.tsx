@@ -47,9 +47,9 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/requests"
-                className="text-sm text-gray-600 hover:text-primary transition-colors"
+                className="text-sm text-gray-600 hover:text-primary transition-colors font-medium"
               >
-                Requests
+                Requests Dashboard
               </Link>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Online</span>

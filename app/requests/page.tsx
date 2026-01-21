@@ -3,19 +3,22 @@ import { requireAuth, getUserProfile } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import LogoutButton from '@/components/LogoutButton';
 import OnlineToggle from '@/components/OnlineToggle';
-import RequestsClient from '@/components/RequestsClient';
+import RequestsDashboard from '@/components/RequestsDashboard';
+import Link from 'next/link';
 
 /**
- * Requests Page (Server Component)
+ * Requests Dashboard (Server Component)
  * 
- * This page displays:
- * 1. Incoming Match Requests (with Accept/Decline actions)
- * 2. Outgoing Match Requests (with Cancel option)
- * 3. Confirmed Matches (after acceptance)
+ * A dedicated dashboard for managing all matchmaking activity:
+ * - Statistics and overview
+ * - Incoming Match Requests (with Accept/Decline actions)
+ * - Outgoing Match Requests (with Cancel option)
+ * - Confirmed Matches (after acceptance)
+ * - Request history
  * 
  * All sections update in real-time using Supabase Realtime.
  */
-export default async function RequestsPage() {
+export default async function RequestsDashboardPage() {
   const user = await requireAuth();
   const profile = await getUserProfile();
   const supabase = await createClient();
@@ -50,6 +53,14 @@ export default async function RequestsPage() {
     .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
     .in('status', ['waiting', 'in_progress'])
     .order('created_at', { ascending: false });
+
+  // Fetch all match history for statistics
+  const { data: allMatchesData } = await supabase
+    .from('matches')
+    .select('*')
+    .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
+    .order('created_at', { ascending: false })
+    .limit(50);
 
   // Collect all user IDs we need to fetch
   const userIdsToFetch = new Set<string>();
@@ -89,15 +100,33 @@ export default async function RequestsPage() {
     };
   });
 
+  // Calculate statistics
+  const stats = {
+    pendingIncoming: incomingRequests.filter(r => r.status === 'pending').length,
+    pendingOutgoing: outgoingRequests.filter(r => r.status === 'pending').length,
+    confirmedMatches: matches.length,
+    totalMatches: allMatchesData?.length || 0,
+    acceptedRequests: outgoingRequests.filter(r => r.status === 'accepted').length,
+    rejectedRequests: outgoingRequests.filter(r => r.status === 'rejected').length,
+  };
+
   return (
     <div className="min-h-screen bg-dark">
       {/* Header */}
-      <header className="bg-neutral border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-neutral border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-heading font-bold text-primary">Match Requests</h1>
-              <p className="text-sm text-gray-600">Manage your matchmaking activity</p>
+            <div className="flex items-center gap-6">
+              <Link
+                href="/dashboard"
+                className="text-sm text-gray-600 hover:text-primary transition-colors flex items-center gap-1"
+              >
+                ← Back to Dashboard
+              </Link>
+              <div>
+                <h1 className="text-2xl font-heading font-bold text-primary">Match Requests Dashboard</h1>
+                <p className="text-sm text-gray-600">Manage your matchmaking activity</p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -112,14 +141,15 @@ export default async function RequestsPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <RequestsClient
+        <RequestsDashboard
           incomingRequests={incomingRequests}
           outgoingRequests={outgoingRequests}
           matches={matches}
+          stats={stats}
           currentUserId={user.id}
+          isOnline={profile?.is_online || false}
         />
       </main>
     </div>
   );
 }
-
