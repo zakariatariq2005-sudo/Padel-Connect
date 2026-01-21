@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { loginAction } from '@/app/actions/auth';
 
 /**
  * Login Page Component
@@ -17,7 +17,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,68 +24,24 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Sign in with email and password
-      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) {
-        // Check if error is due to unconfirmed email
-        if (signInError.message.includes('email') || signInError.message.includes('confirm') || signInError.message.includes('Invalid')) {
-          setError('Invalid credentials. If you just signed up, please check your email to confirm your account first.');
-        } else {
-          setError(signInError.message);
-        }
-        setLoading(false);
-        return;
-      }
-
-      if (!authData.session || !authData.user) {
-        setError('Login failed. Please try again.');
-        setLoading(false);
-        return;
-      }
-
-      // Update player online status
-      if (authData.user) {
-        try {
-          await supabase
-            .from('players')
-            .update({ is_online: true })
-            .eq('user_id', authData.user.id);
-        } catch (profileError) {
-          // If profile doesn't exist, create it
-          await supabase
-            .from('players')
-            .insert({
-              user_id: authData.user.id,
-              name: authData.user.email?.split('@')[0] || 'Player',
-              skill_level: 'Beginner',
-              location: 'Unknown',
-              is_online: true,
-            });
-        }
-      }
-
-      // Wait a moment for cookies to be set by the browser
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const result = await loginAction(email, password);
       
-      // Verify session is set
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        setError('Session not established. Please try again.');
+      if (!result.success) {
+        setError(result.error || 'Login failed. Please try again.');
         setLoading(false);
         return;
       }
       
-      // Redirect using router with a small delay to ensure cookies are sent
+      // If we get here, redirect happened in the server action
+      // But just in case, redirect client-side too
       router.push('/dashboard');
-      // Also refresh to ensure server-side gets the cookies
-      setTimeout(() => {
-        router.refresh();
-      }, 100);
+      router.refresh();
     } catch (err: unknown) {
+      // If redirect was called in server action, this will be a redirect error (expected)
+      if (err && typeof err === 'object' && 'digest' in err) {
+        // This is a Next.js redirect, which is expected
+        return;
+      }
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';
       setError('An unexpected error occurred: ' + errorMsg);
       setLoading(false);
