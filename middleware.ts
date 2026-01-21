@@ -1,41 +1,13 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
- * Middleware - Handles session refresh and cookie sync
+ * Middleware - Simplified
  * 
- * This middleware ensures that Supabase auth cookies are properly synced
- * between client and server by refreshing the session on every request.
+ * Auth protection is handled on individual pages to avoid cookie sync issues.
+ * This middleware just passes requests through.
  */
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
-
-  // Refresh session - this ensures cookies are synced and session is valid
-  const { data: { user } } = await supabase.auth.getUser();
-
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
@@ -43,3 +15,5 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
+
+
