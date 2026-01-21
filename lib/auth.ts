@@ -7,9 +7,20 @@ import { redirect } from 'next/navigation';
  * This is useful for checking authentication status in Server Components.
  */
 export async function getUser() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error } = await supabase.auth.getUser();
+    
+    // If there's an error or no user, return null
+    if (error || !user) {
+      return null;
+    }
+    
+    return user;
+  } catch (error) {
+    // If there's any error getting the user, return null
+    return null;
+  }
 }
 
 /**
