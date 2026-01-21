@@ -66,7 +66,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-dark pb-20 md:pb-0">
-      <Header isOnline={profile?.is_online || false} userName={profile?.name} />
+      <Header isOnline={profile?.is_online || false} />
 
       <main className="pt-20 px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         <div className="bg-neutral rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
