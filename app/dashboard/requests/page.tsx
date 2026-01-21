@@ -197,20 +197,18 @@ export default function RequestsPage() {
               {pendingIncoming.map((request) => (
                 <div
                   key={request.id}
-                  className="bg-neutral rounded-lg shadow p-5 border border-gray-200"
+                  className="bg-dark-light rounded-lg shadow p-5 border border-dark-lighter text-center"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-dark mb-1">
-                        {request.sender?.name || 'Unknown Player'}
-                      </h3>
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <p><span className="font-medium">Skill:</span> {request.sender?.skill_level || 'N/A'}</p>
-                        <p><span className="font-medium">City:</span> {request.sender?.location || 'N/A'}</p>
-                        <p className="text-xs text-gray-500">
-                          {formatDistanceToNow(new Date(request.created_at), { addSuffix: true })}
-                        </p>
-                      </div>
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-neutral mb-1">
+                      {request.sender?.name || 'Unknown Player'}
+                    </h3>
+                    <div className="space-y-1 text-sm text-gray-300">
+                      <p><span className="font-medium">Skill:</span> {request.sender?.skill_level || 'N/A'}</p>
+                      <p><span className="font-medium">City:</span> {request.sender?.location || 'N/A'}</p>
+                      <p className="text-xs text-gray-400">
+                        {formatDistanceToNow(new Date(request.created_at), { addSuffix: true })}
+                      </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -224,7 +222,7 @@ export default function RequestsPage() {
                     <button
                       onClick={() => handleDecline(request.id)}
                       disabled={actionLoading !== null}
-                      className="flex-1 bg-gray-200 text-dark font-medium py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 bg-gray-600 text-neutral font-medium py-2 px-4 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {actionLoading === `decline-${request.id}` ? 'Declining...' : 'Decline'}
                     </button>
@@ -233,8 +231,8 @@ export default function RequestsPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-neutral rounded-lg shadow p-8 text-center">
-              <p className="text-gray-600">No incoming requests at the moment.</p>
+            <div className="bg-dark-light rounded-lg shadow p-8 border border-dark-lighter text-center">
+              <p className="text-gray-300">No incoming requests at the moment.</p>
             </div>
           )}
         </section>
@@ -250,35 +248,33 @@ export default function RequestsPage() {
               {pendingOutgoing.map((request) => (
                 <div
                   key={request.id}
-                  className="bg-neutral rounded-lg shadow p-5 border border-gray-200"
+                  className="bg-dark-light rounded-lg shadow p-5 border border-dark-lighter text-center"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-dark mb-1">
-                        {request.receiver?.name || 'Unknown Player'}
-                      </h3>
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <p><span className="font-medium">Skill:</span> {request.receiver?.skill_level || 'N/A'}</p>
-                        <p><span className="font-medium">City:</span> {request.receiver?.location || 'N/A'}</p>
-                        <span className="inline-block px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full mt-2">
-                          Pending
-                        </span>
-                      </div>
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-neutral mb-1">
+                      {request.receiver?.name || 'Unknown Player'}
+                    </h3>
+                    <div className="space-y-1 text-sm text-gray-300">
+                      <p><span className="font-medium">Skill:</span> {request.receiver?.skill_level || 'N/A'}</p>
+                      <p><span className="font-medium">City:</span> {request.receiver?.location || 'N/A'}</p>
+                      <span className="inline-block px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full mt-2">
+                        Pending
+                      </span>
                     </div>
-                    <button
-                      onClick={() => handleCancel(request.id)}
-                      disabled={actionLoading !== null}
-                      className="bg-gray-200 text-dark font-medium py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {actionLoading === `cancel-${request.id}` ? 'Cancelling...' : 'Cancel'}
-                    </button>
                   </div>
+                  <button
+                    onClick={() => handleCancel(request.id)}
+                    disabled={actionLoading !== null}
+                    className="w-full bg-gray-600 text-neutral font-medium py-2 px-4 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {actionLoading === `cancel-${request.id}` ? 'Cancelling...' : 'Cancel'}
+                  </button>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-neutral rounded-lg shadow p-6 text-center mb-4">
-              <p className="text-gray-600 text-sm">No active outgoing requests.</p>
+            <div className="bg-dark-light rounded-lg shadow p-6 border border-dark-lighter text-center mb-4">
+              <p className="text-gray-300 text-sm">No active outgoing requests.</p>
             </div>
           )}
 
@@ -298,16 +294,12 @@ export default function RequestsPage() {
                   return (
                     <div
                       key={request.id}
-                      className="bg-neutral rounded-lg shadow p-4 border border-gray-200"
+                      className="bg-dark-light rounded-lg shadow p-4 border border-dark-lighter text-center"
                     >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium text-dark">{request.receiver?.name || 'Unknown Player'}</p>
-                          <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full mt-1 ${statusColors[request.status] || 'bg-gray-100 text-gray-800'}`}>
-                            {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                          </span>
-                        </div>
-                      </div>
+                      <p className="font-medium text-neutral mb-2">{request.receiver?.name || 'Unknown Player'}</p>
+                      <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusColors[request.status] || 'bg-gray-100 text-gray-800'}`}>
+                        {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                      </span>
                     </div>
                   );
                 })}
@@ -327,37 +319,43 @@ export default function RequestsPage() {
               {matches.map((match) => (
                 <div
                   key={match.id}
-                  className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg shadow p-5 border border-primary/20"
+                  className="bg-dark-light rounded-lg shadow p-5 border border-dark-lighter text-center"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-neutral mb-1">
-                        Match with {match.opponent?.name || 'Unknown Player'}
-                      </h3>
-                      <div className="space-y-1 text-sm text-gray-400">
-                        <p><span className="font-medium">Skill:</span> {match.opponent?.skill_level || 'N/A'}</p>
-                        <p><span className="font-medium">City:</span> {match.opponent?.location || 'N/A'}</p>
-                        {match.started_at && (
-                          <p className="text-xs text-gray-500">
-                            Started {formatDistanceToNow(new Date(match.started_at), { addSuffix: true })}
-                          </p>
-                        )}
-                      </div>
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-neutral mb-1">
+                      Match with {match.opponent?.name || 'Unknown Player'}
+                    </h3>
+                    <div className="space-y-1 text-sm text-gray-300">
+                      <p><span className="font-medium">Skill:</span> {match.opponent?.skill_level || 'N/A'}</p>
+                      <p><span className="font-medium">City:</span> {match.opponent?.location || 'N/A'}</p>
+                      {match.created_at && (
+                        <p className="text-xs text-gray-400">
+                          Created {formatDistanceToNow(new Date(match.created_at), { addSuffix: true })}
+                        </p>
+                      )}
                     </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
                     <button
                       onClick={() => router.push(`/match/${match.id}`)}
-                      className="bg-primary text-neutral font-medium py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
+                      className="w-full bg-primary text-neutral font-medium py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
                     >
                       View Match
                     </button>
+                    {/* TODO: Implement chat functionality */}
+                    <button
+                      disabled
+                      className="w-full bg-gray-600 text-neutral font-medium py-2 px-4 rounded-lg opacity-50 cursor-not-allowed"
+                    >
+                      Open Chat
+                    </button>
                   </div>
-                  {/* TODO: Add "Open Chat" button when chat functionality is implemented */}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-neutral rounded-lg shadow p-8 text-center">
-              <p className="text-gray-600">No confirmed matches yet.</p>
+            <div className="bg-dark-light rounded-lg shadow p-8 border border-dark-lighter text-center">
+              <p className="text-gray-300">No confirmed matches yet.</p>
             </div>
           )}
         </section>

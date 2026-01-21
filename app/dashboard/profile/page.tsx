@@ -69,34 +69,34 @@ export default function ProfilePage() {
       <Header isOnline={profile?.is_online || false} />
 
       <main className="pt-20 px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-        <div className="bg-neutral rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
-          <h2 className="text-2xl font-heading font-bold text-dark mb-6">
+        <div className="bg-dark-light rounded-lg shadow-lg p-8 max-w-2xl mx-auto border border-dark-lighter">
+          <h2 className="text-2xl font-heading font-bold text-neutral mb-6 text-center">
             Your Profile
           </h2>
           
           <div className="space-y-4 mb-8">
-            <div className="flex justify-between items-center py-3 border-b border-gray-200">
-              <span className="text-gray-600 font-medium">Name</span>
-              <span className="text-dark font-semibold">{profile?.name || 'Not set'}</span>
+            <div className="flex justify-between items-center py-3 border-b border-dark-lighter">
+              <span className="text-gray-300 font-medium">Name</span>
+              <span className="text-neutral font-semibold">{profile?.name || 'Not set'}</span>
             </div>
             
-            <div className="flex justify-between items-center py-3 border-b border-gray-200">
-              <span className="text-gray-600 font-medium">Skill Level</span>
-              <span className="text-dark font-semibold">{profile?.skill_level || 'Not set'}</span>
+            <div className="flex justify-between items-center py-3 border-b border-dark-lighter">
+              <span className="text-gray-300 font-medium">Skill Level</span>
+              <span className="text-neutral font-semibold">{profile?.skill_level || 'Not set'}</span>
             </div>
             
-            <div className="flex justify-between items-center py-3 border-b border-gray-200">
-              <span className="text-gray-600 font-medium">City</span>
-              <span className="text-dark font-semibold">{profile?.location || 'Not set'}</span>
+            <div className="flex justify-between items-center py-3 border-b border-dark-lighter">
+              <span className="text-gray-300 font-medium">City</span>
+              <span className="text-neutral font-semibold">{profile?.location || 'Not set'}</span>
             </div>
             
             <div className="flex justify-between items-center py-3">
-              <span className="text-gray-600 font-medium">Email</span>
-              <span className="text-dark font-semibold">{user.email}</span>
+              <span className="text-gray-300 font-medium">Email</span>
+              <span className="text-neutral font-semibold">{user.email}</span>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-gray-200">
+          <div className="pt-6 border-t border-dark-lighter text-center">
             <LogoutButton />
           </div>
         </div>
