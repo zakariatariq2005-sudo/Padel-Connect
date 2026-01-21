@@ -2,58 +2,38 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { loginAction } from '@/app/actions/login';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit() {
-    if (!email || !password) {
-      setError('Please enter email and password');
-      return;
-    }
-
-    setError('');
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
     setLoading(true);
 
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('password', password);
+
     try {
-      const supabase = createClient();
-      
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) {
-        // Check if error is due to unconfirmed email
-        if (signInError.message.includes('email') || signInError.message.includes('confirm') || signInError.message.includes('Invalid')) {
-          setError('Invalid credentials. If you just signed up, please check your email to confirm your account first.');
-        } else {
-          setError(signInError.message);
-        }
+      const result = await loginAction(formData);
+      if (result && !result.success) {
+        setError(result.error || 'Login failed');
         setLoading(false);
+      }
+      // If successful, redirect happens in the server action
+    } catch (err) {
+      // Redirect throws an error, which is expected
+      if (err && typeof err === 'object' && 'digest' in err) {
+        // This is a Next.js redirect, ignore it
         return;
       }
-
-      // Wait for cookies to be set and session to be established
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Verify session is actually set
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        setError('Session not established. Please try again.');
-        setLoading(false);
-        return;
-      }
-      
-      // Redirect on success - use full page reload to ensure cookies are sent
-      window.location.href = '/dashboard';
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-      setError('An unexpected error occurred: ' + errorMsg);
+      setError('An unexpected error occurred');
       setLoading(false);
     }
   }
@@ -67,28 +47,34 @@ export default function LoginPage() {
           </h1>
           <p className="text-gray-600 text-center mb-8">Welcome back! Please log in to continue.</p>
 
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-dark mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-dark mb-2">
                 Email Address
               </label>
               <input
+                id="email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-dark mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-dark mb-2">
                 Password
               </label>
               <input
+                id="password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
                 placeholder="••••••••"
               />
@@ -112,7 +98,8 @@ export default function LoginPage() {
                       if (resendError) {
                         setError('Error: ' + resendError.message);
                       } else {
-                        setError('Confirmation email sent! Please check your inbox (and spam folder).');
+                        setError('');
+                        alert('Confirmation email sent! Please check your inbox (and spam folder).');
                       }
                     }}
                     className="mt-2 text-sm text-blue-600 hover:underline block"
@@ -124,14 +111,13 @@ export default function LoginPage() {
             )}
 
             <button
-              type="button"
+              type="submit"
               disabled={loading}
-              onClick={() => handleSubmit()}
               className="w-full bg-primary text-neutral font-medium py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Logging in...' : 'Log In'}
             </button>
-          </div>
+          </form>
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Don&apos;t have an account?{' '}
