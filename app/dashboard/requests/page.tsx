@@ -1,0 +1,370 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { acceptMatchRequest, declineMatchRequest, cancelMatchRequest } from '@/app/actions/matchmaking';
+import Header from '@/components/Header';
+import BottomNav from '@/components/BottomNav';
+import { formatDistanceToNow } from 'date-fns';
+
+/**
+ * Requests Page
+ * 
+ * Shows three sections:
+ * 1. Incoming Requests
+ * 2. Outgoing Requests
+ * 3. Confirmed Matches
+ * 
+ * All existing handlers preserved - only UI structure rebuilt.
+ */
+export default function RequestsPage() {
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [incomingRequests, setIncomingRequests] = useState<any[]>([]);
+  const [outgoingRequests, setOutgoingRequests] = useState<any[]>([]);
+  const [matches, setMatches] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const loadRequests = async () => {
+      try {
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !authUser) {
+          router.push('/login');
+          return;
+        }
+
+        setUser(authUser);
+
+        // Load profile
+        const { data: profileData } = await supabase
+          .from('players')
+          .select('*')
+          .eq('user_id', authUser.id)
+          .single();
+        
+        setProfile(profileData);
+
+        // Expire old requests
+        await supabase
+          .from('match_requests')
+          .update({ status: 'expired' })
+          .eq('status', 'pending')
+          .lt('expires_at', new Date().toISOString());
+
+        // Load incoming requests
+        const { data: incomingData } = await supabase
+          .from('match_requests')
+          .select('*')
+          .eq('receiver_id', authUser.id)
+          .in('status', ['pending', 'accepted'])
+          .order('created_at', { ascending: false });
+
+        // Load outgoing requests
+        const { data: outgoingData } = await supabase
+          .from('match_requests')
+          .select('*')
+          .eq('sender_id', authUser.id)
+          .in('status', ['pending', 'accepted', 'rejected', 'expired', 'cancelled'])
+          .order('created_at', { ascending: false });
+
+        // Load matches
+        const { data: matchesData } = await supabase
+          .from('matches')
+          .select('*')
+          .or(`player1_id.eq.${authUser.id},player2_id.eq.${authUser.id}`)
+          .in('status', ['waiting', 'in_progress'])
+          .order('created_at', { ascending: false });
+
+        // Fetch player profiles
+        const userIds = new Set<string>();
+        (incomingData || []).forEach((r: any) => userIds.add(r.sender_id));
+        (outgoingData || []).forEach((r: any) => userIds.add(r.receiver_id));
+        (matchesData || []).forEach((m: any) => {
+          userIds.add(m.player1_id);
+          userIds.add(m.player2_id);
+        });
+
+        const { data: playersData } = await supabase
+          .from('players')
+          .select('*')
+          .in('user_id', Array.from(userIds));
+
+        const playersMap = new Map((playersData || []).map((p: any) => [p.user_id, p]));
+
+        setIncomingRequests((incomingData || []).map((r: any) => ({
+          ...r,
+          sender: playersMap.get(r.sender_id),
+        })));
+
+        setOutgoingRequests((outgoingData || []).map((r: any) => ({
+          ...r,
+          receiver: playersMap.get(r.receiver_id),
+        })));
+
+        setMatches((matchesData || []).map((m: any) => {
+          const opponentId = m.player1_id === authUser.id ? m.player2_id : m.player1_id;
+          return {
+            ...m,
+            opponent: playersMap.get(opponentId),
+          };
+        }));
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading requests:', error);
+        router.push('/login');
+      }
+    };
+
+    loadRequests();
+  }, [router, supabase]);
+
+  const handleAccept = async (requestId: string) => {
+    setActionLoading(`accept-${requestId}`);
+    const result = await acceptMatchRequest(requestId);
+    
+    if (result.success && result.data?.match) {
+      router.push(`/match/${result.data.match.id}`);
+    } else {
+      alert(result.error || 'Failed to accept request');
+      router.refresh();
+    }
+    setActionLoading(null);
+  };
+
+  const handleDecline = async (requestId: string) => {
+    setActionLoading(`decline-${requestId}`);
+    const result = await declineMatchRequest(requestId);
+    
+    if (!result.success) {
+      alert(result.error || 'Failed to decline request');
+    }
+    
+    router.refresh();
+    setActionLoading(null);
+  };
+
+  const handleCancel = async (requestId: string) => {
+    setActionLoading(`cancel-${requestId}`);
+    const result = await cancelMatchRequest(requestId);
+    
+    if (!result.success) {
+      alert(result.error || 'Failed to cancel request');
+    }
+    
+    router.refresh();
+    setActionLoading(null);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-dark flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-neutral text-lg font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const pendingIncoming = incomingRequests.filter(r => r.status === 'pending');
+  const pendingOutgoing = outgoingRequests.filter(r => r.status === 'pending');
+  const otherOutgoing = outgoingRequests.filter(r => r.status !== 'pending');
+
+  return (
+    <div className="min-h-screen bg-dark pb-20 md:pb-0">
+      <Header isOnline={profile?.is_online || false} userName={profile?.name} />
+
+      <main className="pt-20 px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto space-y-8">
+        {/* Incoming Requests Section */}
+        <section>
+          <h2 className="text-2xl font-heading font-bold text-neutral mb-4">
+            Incoming Requests
+          </h2>
+          
+          {pendingIncoming.length > 0 ? (
+            <div className="space-y-3">
+              {pendingIncoming.map((request) => (
+                <div
+                  key={request.id}
+                  className="bg-neutral rounded-lg shadow p-5 border border-gray-200"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-dark mb-1">
+                        {request.sender?.name || 'Unknown Player'}
+                      </h3>
+                      <div className="space-y-1 text-sm text-gray-600">
+                        <p><span className="font-medium">Skill:</span> {request.sender?.skill_level || 'N/A'}</p>
+                        <p><span className="font-medium">City:</span> {request.sender?.location || 'N/A'}</p>
+                        <p className="text-xs text-gray-500">
+                          {formatDistanceToNow(new Date(request.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleAccept(request.id)}
+                      disabled={actionLoading !== null}
+                      className="flex-1 bg-secondary text-neutral font-medium py-2 px-4 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {actionLoading === `accept-${request.id}` ? 'Accepting...' : 'Accept'}
+                    </button>
+                    <button
+                      onClick={() => handleDecline(request.id)}
+                      disabled={actionLoading !== null}
+                      className="flex-1 bg-gray-200 text-dark font-medium py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {actionLoading === `decline-${request.id}` ? 'Declining...' : 'Decline'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-neutral rounded-lg shadow p-8 text-center">
+              <p className="text-gray-600">No incoming requests at the moment.</p>
+            </div>
+          )}
+        </section>
+
+        {/* Outgoing Requests Section */}
+        <section>
+          <h2 className="text-2xl font-heading font-bold text-neutral mb-4">
+            Your Requests
+          </h2>
+          
+          {pendingOutgoing.length > 0 ? (
+            <div className="space-y-3 mb-4">
+              {pendingOutgoing.map((request) => (
+                <div
+                  key={request.id}
+                  className="bg-neutral rounded-lg shadow p-5 border border-gray-200"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-dark mb-1">
+                        {request.receiver?.name || 'Unknown Player'}
+                      </h3>
+                      <div className="space-y-1 text-sm text-gray-600">
+                        <p><span className="font-medium">Skill:</span> {request.receiver?.skill_level || 'N/A'}</p>
+                        <p><span className="font-medium">City:</span> {request.receiver?.location || 'N/A'}</p>
+                        <span className="inline-block px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full mt-2">
+                          Pending
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleCancel(request.id)}
+                      disabled={actionLoading !== null}
+                      className="bg-gray-200 text-dark font-medium py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {actionLoading === `cancel-${request.id}` ? 'Cancelling...' : 'Cancel'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-neutral rounded-lg shadow p-6 text-center mb-4">
+              <p className="text-gray-600 text-sm">No active outgoing requests.</p>
+            </div>
+          )}
+
+          {/* Request History */}
+          {otherOutgoing.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-400 mb-3">Request History</h3>
+              <div className="space-y-2">
+                {otherOutgoing.map((request) => {
+                  const statusColors: Record<string, string> = {
+                    accepted: 'bg-green-100 text-green-800',
+                    rejected: 'bg-red-100 text-red-800',
+                    expired: 'bg-gray-100 text-gray-800',
+                    cancelled: 'bg-gray-100 text-gray-800',
+                  };
+                  
+                  return (
+                    <div
+                      key={request.id}
+                      className="bg-neutral rounded-lg shadow p-4 border border-gray-200"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-medium text-dark">{request.receiver?.name || 'Unknown Player'}</p>
+                          <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full mt-1 ${statusColors[request.status] || 'bg-gray-100 text-gray-800'}`}>
+                            {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Confirmed Matches Section */}
+        <section>
+          <h2 className="text-2xl font-heading font-bold text-neutral mb-4">
+            Confirmed Matches
+          </h2>
+          
+          {matches.length > 0 ? (
+            <div className="space-y-3">
+              {matches.map((match) => (
+                <div
+                  key={match.id}
+                  className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg shadow p-5 border border-primary/20"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-neutral mb-1">
+                        Match with {match.opponent?.name || 'Unknown Player'}
+                      </h3>
+                      <div className="space-y-1 text-sm text-gray-400">
+                        <p><span className="font-medium">Skill:</span> {match.opponent?.skill_level || 'N/A'}</p>
+                        <p><span className="font-medium">City:</span> {match.opponent?.location || 'N/A'}</p>
+                        {match.started_at && (
+                          <p className="text-xs text-gray-500">
+                            Started {formatDistanceToNow(new Date(match.started_at), { addSuffix: true })}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => router.push(`/match/${match.id}`)}
+                      className="bg-primary text-neutral font-medium py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
+                    >
+                      View Match
+                    </button>
+                  </div>
+                  {/* TODO: Add "Open Chat" button when chat functionality is implemented */}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-neutral rounded-lg shadow p-8 text-center">
+              <p className="text-gray-600">No confirmed matches yet.</p>
+            </div>
+          )}
+        </section>
+      </main>
+
+      <BottomNav />
+    </div>
+  );
+}
+

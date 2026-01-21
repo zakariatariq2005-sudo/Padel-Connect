@@ -3,22 +3,24 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import LogoutButton from '@/components/LogoutButton';
-import OnlineToggle from '@/components/OnlineToggle';
-import PlayerList from '@/components/PlayerList';
-import Link from 'next/link';
+import { sendMatchRequest } from '@/app/actions/matchmaking';
+import Header from '@/components/Header';
+import BottomNav from '@/components/BottomNav';
+import HeroSection from '@/components/HeroSection';
+import PlayerCard from '@/components/PlayerCard';
 
 /**
- * Dashboard Page (Client Component)
+ * Dashboard Page - Players
  * 
- * Checks auth client-side first to avoid cookie sync issues,
- * then loads data once authenticated.
+ * Main page showing online players and matchmaking interface.
+ * All existing logic preserved - only UI structure rebuilt.
  */
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [players, setPlayers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [requesting, setRequesting] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -80,6 +82,20 @@ export default function DashboardPage() {
     loadDashboard();
   }, [router, supabase]);
 
+  const handleRequestMatch = async (playerId: string) => {
+    setRequesting(playerId);
+    const result = await sendMatchRequest(playerId);
+    
+    if (!result.success) {
+      alert(result.error || 'Failed to send match request');
+    } else {
+      alert('Match request sent!');
+      router.refresh();
+    }
+    
+    setRequesting(null);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-dark flex items-center justify-center">
@@ -92,67 +108,43 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    return null; // Router will handle redirect
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-dark">
-      {/* Header */}
-      <header className="bg-neutral border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-heading font-bold text-primary">PadelConnect</h1>
-              <p className="text-sm text-gray-600">Welcome, {profile?.name || 'Player'}!</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/requests"
-                className="text-sm text-gray-600 hover:text-primary transition-colors font-medium"
-              >
-                Requests Dashboard
-              </Link>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Online</span>
-                <OnlineToggle initialStatus={profile?.is_online || false} />
-              </div>
-              <LogoutButton />
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-dark pb-20 md:pb-0">
+      <Header isOnline={profile?.is_online || false} userName={profile?.name} />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h2 className="text-3xl font-heading font-bold text-neutral mb-2">
+      <main className="pt-20 px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+        {/* Hero Section */}
+        <HeroSection isOnline={profile?.is_online || false} />
+
+        {/* Online Players Section */}
+        <section className="mb-8">
+          <h2 className="text-2xl font-heading font-bold text-neutral mb-4">
             Online Players
           </h2>
-          <p className="text-gray-400">
-            Find players to match with and start playing padel!
-          </p>
-        </div>
-
-        {/* Player List */}
-        {players && players.length > 0 ? (
-          <PlayerList players={players} currentUserId={user.id} />
-        ) : (
-          <div className="bg-neutral rounded-lg shadow p-8 text-center">
-            <p className="text-gray-600">No other players online at the moment.</p>
-            <p className="text-sm text-gray-500 mt-2">Check back soon to find matches!</p>
-          </div>
-        )}
-
-        {/* Quick Link to Requests */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/requests"
-            className="inline-block bg-primary text-neutral font-medium py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
-          >
-            View All Match Requests →
-          </Link>
-        </div>
+          
+          {players && players.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {players.map((player) => (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  onRequestMatch={handleRequestMatch}
+                  isRequesting={requesting === player.user_id}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-neutral rounded-lg shadow p-8 text-center">
+              <p className="text-gray-600">No other players online right now</p>
+            </div>
+          )}
+        </section>
       </main>
+
+      <BottomNav />
     </div>
   );
 }
