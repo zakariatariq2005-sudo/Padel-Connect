@@ -26,33 +26,56 @@ export default function LoginPage() {
 
     try {
       // Sign in with email and password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
-        setError(signInError.message);
+        // Check if error is due to unconfirmed email
+        if (signInError.message.includes('email') || signInError.message.includes('confirm') || signInError.message.includes('Invalid')) {
+          setError('Invalid credentials. If you just signed up, please check your email to confirm your account first.');
+        } else {
+          setError(signInError.message);
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (!authData.session || !authData.user) {
+        setError('Login failed. Please try again.');
         setLoading(false);
         return;
       }
 
       // Update player online status
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
+      try {
         await supabase
           .from('players')
           .update({ is_online: true })
-          .eq('user_id', user.id);
+          .eq('user_id', authData.user.id);
+      } catch (profileError) {
+        // If profile doesn't exist, create it
+        await supabase
+          .from('players')
+          .insert({
+            user_id: authData.user.id,
+            name: authData.user.email?.split('@')[0] || 'Player',
+            skill_level: 'Beginner',
+            location: 'Unknown',
+            is_online: true,
+          });
       }
 
-      // Redirect to dashboard on success
-      router.push('/dashboard');
-      router.refresh();
-    } catch (err) {
-      setError('An unexpected error occurred');
+      // Wait briefly for session to sync
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Use window.location for a full page reload to ensure cookies are synced
+      window.location.href = '/dashboard';
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+      setError('An unexpected error occurred: ' + errorMsg);
       setLoading(false);
-
     }
   };
 
