@@ -17,6 +17,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedImagePreview, setSelectedImagePreview] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -64,12 +65,74 @@ export default function ProfilePage() {
     return null;
   }
 
+  const handleAvatarClick = () => {
+    const fileInput = document.getElementById('profile-photo-input') as HTMLInputElement;
+    fileInput?.click();
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      // TODO: Implement upload logic here
+      // - Upload file to storage (Supabase Storage or similar)
+      // - Get public URL
+      // - Update profile.photo_url in database
+      // - Refresh profile data
+    }
+  };
+
+  const displayImage = selectedImagePreview || profile?.photo_url;
+
   return (
     <div className="min-h-screen bg-dark pb-20 md:pb-0">
       <Header isOnline={profile?.is_online || false} />
 
       <main className="pt-20 px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         <div className="bg-dark-light rounded-lg shadow-lg p-8 max-w-2xl mx-auto border border-dark-lighter">
+          {/* Profile Photo */}
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={handleAvatarClick}
+              className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-dark-lighter hover:border-primary transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-dark-light"
+            >
+              {displayImage ? (
+                <img
+                  src={displayImage}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-dark-lighter flex items-center justify-center">
+                  <svg
+                    className="w-12 h-12 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+              )}
+            </button>
+            <input
+              id="profile-photo-input"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
+          </div>
+
           <h2 className="text-2xl font-heading font-bold text-neutral mb-6 text-center">
             Your Profile
           </h2>
