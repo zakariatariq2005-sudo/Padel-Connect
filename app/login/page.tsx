@@ -49,37 +49,32 @@ export default function LoginPage() {
       }
 
       // Update player online status
-      try {
-        await supabase
-          .from('players')
-          .update({ is_online: true })
-          .eq('user_id', authData.user.id);
-      } catch (profileError) {
-        // If profile doesn't exist, create it
-        await supabase
-          .from('players')
-          .insert({
-            user_id: authData.user.id,
-            name: authData.user.email?.split('@')[0] || 'Player',
-            skill_level: 'Beginner',
-            location: 'Unknown',
-            is_online: true,
-          });
+      if (authData.user) {
+        try {
+          await supabase
+            .from('players')
+            .update({ is_online: true })
+            .eq('user_id', authData.user.id);
+        } catch (profileError) {
+          // If profile doesn't exist, create it
+          await supabase
+            .from('players')
+            .insert({
+              user_id: authData.user.id,
+              name: authData.user.email?.split('@')[0] || 'Player',
+              skill_level: 'Beginner',
+              location: 'Unknown',
+              is_online: true,
+            });
+        }
       }
 
-      // Wait for session to be fully established and cookies to be set
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Wait briefly for session to sync
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Verify session one more time
-      const { data: { session: finalSession } } = await supabase.auth.getSession();
-      if (!finalSession) {
-        setError('Session not established. Please try again.');
-        setLoading(false);
-        return;
-      }
-      
-      // Use window.location for a full page reload to ensure cookies are synced
-      window.location.href = '/dashboard';
+      // Redirect to dashboard on success
+      router.push('/dashboard');
+      router.refresh();
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';
       setError('An unexpected error occurred: ' + errorMsg);

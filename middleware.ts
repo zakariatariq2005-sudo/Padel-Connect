@@ -1,41 +1,13 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
- * Middleware - Handles session refresh
+ * Middleware - Simplified
  * 
- * This middleware refreshes the user's session on every request to ensure
- * authentication cookies are properly synced between client and server.
+ * Auth protection is handled on individual pages to avoid cookie sync issues.
+ * This middleware just passes requests through.
  */
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
-
-  // Refresh session if expired - this ensures cookies are synced
-  await supabase.auth.getUser();
-
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
