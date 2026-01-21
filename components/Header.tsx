@@ -20,7 +20,17 @@ export default function Header({
         <div className="flex justify-between items-center h-16">
           {/* App Name - Left */}
           <div>
-            <h1 className="text-xl font-heading font-bold" style={{ color: '#14b8a6' }}>PadelConnect</h1>
+            <h1 className="text-xl font-heading font-bold">
+              <span 
+                className="bg-clip-text text-transparent"
+                style={{ 
+                  backgroundImage: 'linear-gradient(to right, #22C55E, #14b8a6)'
+                }}
+              >
+                Padel
+              </span>
+              <span style={{ color: '#14b8a6' }}>Connect</span>
+            </h1>
           </div>
 
           {/* Online Status - Right */}
