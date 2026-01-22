@@ -17,6 +17,7 @@ export default function MatchFoundCard({
     nickname?: string;
     skill_level: string;
     location: string;
+    photo_url?: string;
   };
   onAccept: () => void;
   onDecline: () => void;
