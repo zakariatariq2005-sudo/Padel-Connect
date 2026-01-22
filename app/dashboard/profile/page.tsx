@@ -38,12 +38,17 @@ export default function ProfilePage() {
 
         setUser(authUser);
 
-        const { data: profileData } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('players')
           .select('*')
           .eq('user_id', authUser.id)
           .single();
         
+        if (profileError) {
+          console.error('Error loading profile:', profileError);
+        }
+        
+        console.log('Profile data loaded:', profileData);
         setProfile(profileData);
         setNickname(profileData?.nickname || '');
         setLoading(false);

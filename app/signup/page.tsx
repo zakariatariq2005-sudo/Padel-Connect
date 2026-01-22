@@ -142,18 +142,26 @@ export default function SignupPage() {
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // Create the player profile in our database
-      const { error: profileError } = await supabase
+      // Ensure all required fields are provided
+      const profileData = {
+        user_id: authData.user.id,
+        nickname: trimmedNickname,
+        skill_level: formData.skillLevel || 'Beginner',
+        location: formData.location.trim() || 'Unknown',
+        is_online: true,
+      };
+
+      console.log('Creating profile with data:', profileData);
+
+      const { data: createdProfile, error: profileError } = await supabase
         .from('players')
-        .insert({
-          user_id: authData.user.id,
-          nickname: trimmedNickname,
-          skill_level: formData.skillLevel,
-          location: formData.location,
-          is_online: true,
-        });
+        .insert(profileData)
+        .select()
+        .single();
 
       if (profileError) {
         console.error('Profile creation error:', profileError);
+        console.error('Profile data attempted:', profileData);
         // Check if it's a unique constraint violation for nickname
         if (profileError.code === '23505' || profileError.message.includes('unique')) {
           setNicknameError('This nickname is already taken');
@@ -163,6 +171,11 @@ export default function SignupPage() {
         }
         setLoading(false);
         return;
+      }
+
+      // Verify profile was created with all fields
+      if (createdProfile) {
+        console.log('Profile created successfully:', createdProfile);
       }
 
       // Verify session exists before redirecting
