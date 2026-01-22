@@ -249,7 +249,7 @@ export default function ProfilePage() {
           <div className="space-y-4 mb-8">
             <div className="py-3 border-b border-dark-lighter">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-300 font-medium">Nickname</span>
+                <span className="text-gray-300 font-medium">Name</span>
               </div>
               <div>
                 <span className="text-neutral font-semibold text-lg">
@@ -257,7 +257,7 @@ export default function ProfilePage() {
                 </span>
                 {!profile?.nickname && (
                   <p className="text-sm text-gray-400 mt-1">
-                    Nickname is set during signup and cannot be changed
+                    Name is set during signup and cannot be changed
                   </p>
                 )}
               </div>

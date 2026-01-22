@@ -32,15 +32,15 @@ export default function SignupPage() {
     const trimmed = nickname.trim();
     
     if (!trimmed) {
-      return 'Nickname is required';
+      return 'Name is required';
     }
     
     if (trimmed.length < 3) {
-      return 'Nickname must be at least 3 characters';
+      return 'Name must be at least 3 characters';
     }
     
     if (trimmed.length > 20) {
-      return 'Nickname must be 20 characters or less';
+      return 'Name must be 20 characters or less';
     }
     
     // Check uniqueness
@@ -59,7 +59,7 @@ export default function SignupPage() {
     }
     
     if (data && data.length > 0) {
-      return 'This nickname is already taken';
+      return 'This name is already taken';
     }
     
     return null;
@@ -71,12 +71,12 @@ export default function SignupPage() {
     setNicknameError(null);
     
     if (trimmed.length > 0 && trimmed.length < 3) {
-      setNicknameError('Nickname must be at least 3 characters');
+        setNicknameError('Name must be at least 3 characters');
       return;
     }
     
     if (trimmed.length > 20) {
-      setNicknameError('Nickname must be 20 characters or less');
+        setNicknameError('Name must be 20 characters or less');
       return;
     }
     
@@ -102,13 +102,13 @@ export default function SignupPage() {
       // Validate nickname
       const trimmedNickname = formData.nickname.trim();
       if (!trimmedNickname) {
-        setNicknameError('Nickname is required');
+        setNicknameError('Name is required');
         setLoading(false);
         return;
       }
       
       if (trimmedNickname.length < 3 || trimmedNickname.length > 20) {
-        setNicknameError('Nickname must be between 3 and 20 characters');
+        setNicknameError('Name must be between 3 and 20 characters');
         setLoading(false);
         return;
       }
@@ -164,7 +164,7 @@ export default function SignupPage() {
         console.error('Profile data attempted:', profileData);
         // Check if it's a unique constraint violation for nickname
         if (profileError.code === '23505' || profileError.message.includes('unique')) {
-          setNicknameError('This nickname is already taken');
+          setNicknameError('This name is already taken');
         } else {
           // Show more detailed error for debugging
           setError(`Failed to create profile: ${profileError.message}. Please try logging in.`);
@@ -207,7 +207,7 @@ export default function SignupPage() {
           <form onSubmit={handleSignup} className="space-y-6">
             <div>
               <label htmlFor="nickname" className="block text-sm font-medium text-dark mb-2">
-                Nickname <span className="text-red-500">*</span>
+                Name <span className="text-red-500">*</span>
               </label>
               <input
                 id="nickname"
@@ -220,7 +220,7 @@ export default function SignupPage() {
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark ${
                   nicknameError ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="Choose a unique nickname (3-20 chars)"
+                placeholder="Choose a unique name (3-20 chars)"
               />
               {nicknameError && (
                 <p className="mt-1 text-sm text-red-600">{nicknameError}</p>
