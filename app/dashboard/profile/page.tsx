@@ -23,6 +23,11 @@ export default function ProfilePage() {
   const [nickname, setNickname] = useState('');
   const [nicknameError, setNicknameError] = useState<string | null>(null);
   const [savingNickname, setSavingNickname] = useState(false);
+  const [editingSkillLevel, setEditingSkillLevel] = useState(false);
+  const [skillLevel, setSkillLevel] = useState('');
+  const [editingLocation, setEditingLocation] = useState(false);
+  const [location, setLocation] = useState('');
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -51,6 +56,8 @@ export default function ProfilePage() {
         console.log('Profile data loaded:', profileData);
         setProfile(profileData);
         setNickname(profileData?.nickname || '');
+        setSkillLevel(profileData?.skill_level || 'Beginner');
+        setLocation(profileData?.location || '');
         setLoading(false);
       } catch (error) {
         console.error('Error loading profile:', error);
@@ -343,14 +350,93 @@ export default function ProfilePage() {
               )}
             </div>
             
-            <div className="flex justify-between items-center py-3 border-b border-dark-lighter">
-              <span className="text-gray-300 font-medium">Skill Level</span>
-              <span className="text-neutral font-semibold">{profile?.skill_level || 'Not set'}</span>
+            <div className="py-3 border-b border-dark-lighter">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-300 font-medium">Skill Level</span>
+                {!editingSkillLevel && (
+                  <button
+                    onClick={() => setEditingSkillLevel(true)}
+                    className="text-primary text-sm hover:underline"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+              {editingSkillLevel ? (
+                <div className="space-y-2">
+                  <select
+                    value={skillLevel}
+                    onChange={(e) => setSkillLevel(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
+                  >
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Professional">Professional</option>
+                  </select>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveSkillLevel}
+                      disabled={saving}
+                      className="px-4 py-2 bg-secondary text-neutral font-medium rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {saving ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      onClick={handleCancelEditSkillLevel}
+                      disabled={saving}
+                      className="px-4 py-2 bg-gray-200 text-dark font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <span className="text-neutral font-semibold">{profile?.skill_level || 'Not set'}</span>
+              )}
             </div>
             
-            <div className="flex justify-between items-center py-3 border-b border-dark-lighter">
-              <span className="text-gray-300 font-medium">City</span>
-              <span className="text-neutral font-semibold">{profile?.location || 'Not set'}</span>
+            <div className="py-3 border-b border-dark-lighter">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-300 font-medium">City</span>
+                {!editingLocation && (
+                  <button
+                    onClick={() => setEditingLocation(true)}
+                    className="text-primary text-sm hover:underline"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+              {editingLocation ? (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
+                    placeholder="Enter your city"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveLocation}
+                      disabled={saving || !location.trim()}
+                      className="px-4 py-2 bg-secondary text-neutral font-medium rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {saving ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      onClick={handleCancelEditLocation}
+                      disabled={saving}
+                      className="px-4 py-2 bg-gray-200 text-dark font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <span className="text-neutral font-semibold">{profile?.location || 'Not set'}</span>
+              )}
             </div>
             
             <div className="flex justify-between items-center py-3">
