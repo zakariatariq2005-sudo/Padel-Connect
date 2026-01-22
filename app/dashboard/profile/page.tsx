@@ -83,7 +83,7 @@ export default function ProfilePage() {
     loadProfile();
   }, [router, supabase]);
 
-  if (loading) {
+  if (loading || !isClient) {
     return (
       <div className="min-h-screen bg-dark flex items-center justify-center">
         <div className="text-center">
