@@ -184,7 +184,7 @@ export default function SignupPage() {
                 required
                 minLength={3}
                 maxLength={20}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark ${
                   nicknameError ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Choose a unique nickname (3-20 chars)"
@@ -207,7 +207,7 @@ export default function SignupPage() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
                 placeholder="you@example.com"
               />
             </div>
@@ -223,7 +223,7 @@ export default function SignupPage() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
                 minLength={6}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
                 placeholder="••••••••"
               />
             </div>
@@ -237,7 +237,7 @@ export default function SignupPage() {
                 value={formData.skillLevel}
                 onChange={(e) => setFormData({ ...formData, skillLevel: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
               >
                 <option value="Beginner">Beginner</option>
                 <option value="Intermediate">Intermediate</option>
@@ -256,7 +256,7 @@ export default function SignupPage() {
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
                 placeholder="City, Country"
               />
             </div>
