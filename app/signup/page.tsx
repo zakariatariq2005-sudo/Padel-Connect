@@ -166,14 +166,23 @@ export default function SignupPage() {
       }
 
       // Verify session exists before redirecting
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        setError('Account created but session not established. Please try logging in.');
-        setLoading(false);
-        return;
+      let session = null;
+      let attempts = 0;
+      while (!session && attempts < 3) {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        session = currentSession;
+        if (!session) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+          attempts++;
+        }
       }
 
-      // Redirect to dashboard (main app)
+      if (!session) {
+        // Even if session check fails, try to redirect - middleware will handle auth
+        console.warn('Session not immediately available, redirecting anyway');
+      }
+
+      // Redirect to dashboard (main app) - this is the primary goal
       router.push('/dashboard');
       router.refresh();
     } catch (err) {
