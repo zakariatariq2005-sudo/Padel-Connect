@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { uploadProfilePhoto } from '@/app/actions/upload';
 import LogoutButton from '@/components/LogoutButton';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
