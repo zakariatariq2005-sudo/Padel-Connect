@@ -299,7 +299,8 @@ export default function ProfilePage() {
     setZoom(1);
   };
 
-  const displayImage = selectedImagePreview || profile?.photo_url;
+  // Only compute displayImage after client-side hydration to avoid mismatch
+  const displayImage = isClient ? (selectedImagePreview || profile?.photo_url) : null;
 
   const handleSaveSkillLevel = async () => {
     setSaving(true);
