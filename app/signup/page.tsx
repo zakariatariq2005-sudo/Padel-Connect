@@ -138,6 +138,9 @@ export default function SignupPage() {
         return;
       }
 
+      // Wait a moment for session to be established
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       // Create the player profile in our database
       const { error: profileError } = await supabase
         .from('players')
@@ -150,18 +153,28 @@ export default function SignupPage() {
         });
 
       if (profileError) {
+        console.error('Profile creation error:', profileError);
         // Check if it's a unique constraint violation for nickname
         if (profileError.code === '23505' || profileError.message.includes('unique')) {
           setNicknameError('This nickname is already taken');
         } else {
-          setError('Account created but failed to create profile. Please try logging in.');
+          // Show more detailed error for debugging
+          setError(`Failed to create profile: ${profileError.message}. Please try logging in.`);
         }
         setLoading(false);
         return;
       }
 
-      // Redirect to add profile photo step (optional, can skip)
-      router.push('/add-profile-photo');
+      // Verify session exists before redirecting
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setError('Account created but session not established. Please try logging in.');
+        setLoading(false);
+        return;
+      }
+
+      // Redirect to dashboard (main app)
+      router.push('/dashboard');
       router.refresh();
     } catch (err) {
       setError('An unexpected error occurred');

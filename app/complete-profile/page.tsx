@@ -164,8 +164,8 @@ export default function CompleteProfilePage() {
         return;
       }
 
-      // Redirect to add profile photo step (optional, can skip)
-      router.push('/add-profile-photo');
+      // Redirect to dashboard (main app)
+      router.push('/dashboard');
       router.refresh();
     } catch (err) {
       setError('An unexpected error occurred');
