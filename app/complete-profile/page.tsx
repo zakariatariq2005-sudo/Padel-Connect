@@ -31,12 +31,12 @@ export default function CompleteProfilePage() {
 
         const { data: profile } = await supabase
           .from('players')
-          .select('nickname')
+          .select('name')
           .eq('user_id', user.id)
           .single();
         
-        // If user already has a nickname, redirect to dashboard
-        if (profile?.nickname) {
+        // If user already has a name, redirect to dashboard
+        if (profile?.name) {
           router.push('/dashboard');
           return;
         }
@@ -72,17 +72,17 @@ export default function CompleteProfilePage() {
     
     const { data, error } = await supabase
       .from('players')
-      .select('nickname, user_id')
-      .eq('nickname', trimmed)
+      .select('name, user_id')
+      .eq('name', trimmed)
       .limit(1);
     
     if (error) {
-      return 'Error checking nickname availability';
+      return 'Error checking name availability';
     }
     
-    // Allow if it's the current user's nickname (for editing)
+    // Allow if it's the current user's name (for editing)
     if (data && data.length > 0 && data[0].user_id !== user.id) {
-      return 'This nickname is already taken';
+      return 'This name is already taken';
     }
     
     return null;
@@ -147,16 +147,16 @@ export default function CompleteProfilePage() {
         return;
       }
 
-      // Update player profile with nickname
+      // Update player profile with name
       const { error: updateError } = await supabase
         .from('players')
-        .update({ nickname: trimmedNickname })
+        .update({ name: trimmedNickname })
         .eq('user_id', user.id);
 
       if (updateError) {
-        // Check if it's a unique constraint violation for nickname
+        // Check if it's a unique constraint violation for name
         if (updateError.code === '23505' || updateError.message.includes('unique')) {
-          setNicknameError('This nickname is already taken');
+          setNicknameError('This name is already taken');
         } else {
           setError('Failed to update profile. Please try again.');
         }
@@ -192,7 +192,7 @@ export default function CompleteProfilePage() {
             Complete Your Profile
           </h1>
           <p className="text-gray-600 text-center mb-8">
-            Choose a nickname to get started. This will be your public display name.
+            Choose a name to get started. This will be your public display name.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -212,7 +212,7 @@ export default function CompleteProfilePage() {
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
                   nicknameError ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="Choose a unique nickname (3-20 chars)"
+                placeholder="Choose a unique name (3-20 chars)"
               />
               {nicknameError && (
                 <p className="mt-1 text-sm text-red-600">{nicknameError}</p>

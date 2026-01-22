@@ -38,15 +38,15 @@ export async function loginAction(formData: FormData) {
 
   // Update player online status
   try {
-    // Check if profile exists and has nickname
+    // Check if profile exists and has name
     const { data: profile } = await supabase
       .from('players')
-      .select('nickname')
+      .select('name')
       .eq('user_id', authData.user.id)
       .single();
     
-    if (profile && !profile.nickname) {
-      // Profile exists but no nickname - allow access, can set from profile page
+    if (profile && !profile.name) {
+      // Profile exists but no name - allow access, can set from profile page
     }
     
     await supabase
@@ -54,14 +54,14 @@ export async function loginAction(formData: FormData) {
       .update({ is_online: true })
       .eq('user_id', authData.user.id);
   } catch (profileError) {
-    // If profile doesn't exist, create it (without nickname)
+    // If profile doesn't exist, create it (without name)
     await supabase
       .from('players')
       .insert({
         user_id: authData.user.id,
         skill_level: 'Beginner',
         location: 'Unknown',
-        is_online: true, // Allow online - nickname can be set later
+        is_online: true, // Allow online - name can be set later
       });
   }
 

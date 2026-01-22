@@ -65,14 +65,14 @@ export default function DashboardPage() {
           setProfile(profileData);
         }
 
-        // Load online players (only those with nicknames)
+        // Load online players (only those with names)
         const { data: playersData } = await supabase
           .from('players')
           .select('*')
           .eq('is_online', true)
           .neq('user_id', authUser.id)
-          .not('nickname', 'is', null)
-          .order('nickname', { ascending: true });
+          .not('name', 'is', null)
+          .order('name', { ascending: true });
 
         setPlayers(playersData || []);
 
@@ -163,12 +163,12 @@ export default function DashboardPage() {
                     {request.receiver?.photo_url && (
                       <img
                         src={request.receiver.photo_url}
-                        alt={request.receiver.nickname || 'Player'}
+                        alt={request.receiver.name || 'Player'}
                         className="w-10 h-10 rounded-full object-cover border-2 border-primary"
                       />
                     )}
                     <p className="font-medium text-neutral">
-                      You requested to play with {request.receiver?.nickname || 'Unknown Player'}
+                      You requested to play with {request.receiver?.name || 'Unknown Player'}
                     </p>
                   </div>
                   <span className="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">

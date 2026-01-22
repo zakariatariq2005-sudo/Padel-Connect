@@ -205,7 +205,7 @@ export default function RequestsPage() {
                       {request.sender?.photo_url ? (
                         <img
                           src={request.sender.photo_url}
-                          alt={request.sender.nickname || 'Player'}
+                          alt={request.sender.name || 'Player'}
                           className="w-12 h-12 rounded-full object-cover border-2 border-primary"
                         />
                       ) : (
@@ -217,7 +217,7 @@ export default function RequestsPage() {
                       )}
                     </div>
                     <h3 className="text-lg font-semibold text-neutral mb-1">
-                      {request.sender?.nickname || 'Unknown Player'}
+                      {request.sender?.name || 'Unknown Player'}
                     </h3>
                     <div className="space-y-1 text-sm text-gray-300">
                       <p><span className="font-medium">Skill:</span> {request.sender?.skill_level || 'N/A'}</p>
@@ -272,7 +272,7 @@ export default function RequestsPage() {
                       {request.receiver?.photo_url ? (
                         <img
                           src={request.receiver.photo_url}
-                          alt={request.receiver.nickname || 'Player'}
+                          alt={request.receiver.name || 'Player'}
                           className="w-12 h-12 rounded-full object-cover border-2 border-primary"
                         />
                       ) : (
@@ -284,7 +284,7 @@ export default function RequestsPage() {
                       )}
                     </div>
                     <h3 className="text-lg font-semibold text-neutral mb-1">
-                      {request.receiver?.nickname || 'Unknown Player'}
+                      {request.receiver?.name || 'Unknown Player'}
                     </h3>
                     <div className="space-y-1 text-sm text-gray-300">
                       <p><span className="font-medium">Skill:</span> {request.receiver?.skill_level || 'N/A'}</p>
@@ -328,7 +328,7 @@ export default function RequestsPage() {
                       key={request.id}
                       className="bg-dark-light rounded-lg shadow p-4 border border-dark-lighter text-center"
                     >
-                      <p className="font-medium text-neutral mb-2">{request.receiver?.nickname || 'Unknown Player'}</p>
+                      <p className="font-medium text-neutral mb-2">{request.receiver?.name || 'Unknown Player'}</p>
                       <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusColors[request.status] || 'bg-gray-100 text-gray-800'}`}>
                         {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                       </span>
@@ -359,7 +359,7 @@ export default function RequestsPage() {
                       {match.opponent?.photo_url ? (
                         <img
                           src={match.opponent.photo_url}
-                          alt={match.opponent.nickname || 'Player'}
+                          alt={match.opponent.name || 'Player'}
                           className="w-12 h-12 rounded-full object-cover border-2 border-primary"
                         />
                       ) : (
@@ -371,7 +371,7 @@ export default function RequestsPage() {
                       )}
                     </div>
                     <h3 className="text-lg font-semibold text-neutral mb-1">
-                      Match with {match.opponent?.nickname || 'Unknown Player'}
+                      Match with {match.opponent?.name || 'Unknown Player'}
                     </h3>
                     <div className="space-y-1 text-sm text-gray-300">
                       <p><span className="font-medium">Skill:</span> {match.opponent?.skill_level || 'N/A'}</p>

@@ -40,10 +40,10 @@ export async function sendMatchRequest(receiverId: string) {
     return { success: false, error: 'Cannot send request to yourself' };
   }
 
-  // Check if sender is online and has nickname
+  // Check if sender is online and has name
   const { data: senderProfile, error: senderError } = await supabase
     .from('players')
-    .select('is_online, nickname')
+    .select('is_online, name')
     .eq('user_id', senderId)
     .single();
 
@@ -51,18 +51,18 @@ export async function sendMatchRequest(receiverId: string) {
     return { success: false, error: 'Your profile not found. Please update your profile.' };
   }
 
-  if (!senderProfile.nickname) {
-    return { success: false, error: 'You must set a nickname before sending match requests. Please complete your profile.' };
+  if (!senderProfile.name) {
+    return { success: false, error: 'You must set a name before sending match requests. Please complete your profile.' };
   }
 
   if (!senderProfile.is_online) {
     return { success: false, error: 'You must be online to send match requests' };
   }
 
-  // Check if receiver is online and has nickname
+  // Check if receiver is online and has name
   const { data: receiverProfile, error: receiverError } = await supabase
     .from('players')
-    .select('is_online, nickname')
+    .select('is_online, name')
     .eq('user_id', receiverId)
     .single();
 
@@ -70,7 +70,7 @@ export async function sendMatchRequest(receiverId: string) {
     return { success: false, error: 'Player not found' };
   }
 
-  if (!receiverProfile.nickname) {
+  if (!receiverProfile.name) {
     return { success: false, error: 'This player has not completed their profile' };
   }
 
@@ -187,29 +187,29 @@ export async function acceptMatchRequest(requestId: string) {
     return { success: false, error: 'This request has expired' };
   }
 
-  // Check if receiver is still online and has nickname
+  // Check if receiver is still online and has name
   const { data: receiverProfile } = await supabase
     .from('players')
-    .select('is_online, nickname')
+    .select('is_online, name')
     .eq('user_id', user.id)
     .single();
 
-  if (!receiverProfile?.nickname) {
-    return { success: false, error: 'You must set a nickname before accepting requests. Please complete your profile.' };
+  if (!receiverProfile?.name) {
+    return { success: false, error: 'You must set a name before accepting requests. Please complete your profile.' };
   }
 
   if (!receiverProfile?.is_online) {
     return { success: false, error: 'You must be online to accept requests' };
   }
 
-  // Check if sender is still online and has nickname
+  // Check if sender is still online and has name
   const { data: senderProfile } = await supabase
     .from('players')
-    .select('is_online, nickname')
+    .select('is_online, name')
     .eq('user_id', request.sender_id)
     .single();
 
-  if (!senderProfile?.nickname) {
+  if (!senderProfile?.name) {
     return { success: false, error: 'The other player has not completed their profile' };
   }
 
@@ -342,15 +342,15 @@ export async function toggleOnlineStatus(isOnline: boolean) {
     return { success: false, error: 'Not authenticated' };
   }
 
-  // Check if user has nickname before allowing online status
+  // Check if user has name before allowing online status
   const { data: profile } = await supabase
     .from('players')
-    .select('nickname')
+    .select('name')
     .eq('user_id', user.id)
     .single();
 
-  if (!profile?.nickname) {
-    return { success: false, error: 'You must set a nickname before going online. Please complete your profile.' };
+  if (!profile?.name) {
+    return { success: false, error: 'You must set a name before going online. Please complete your profile.' };
   }
 
   const { error } = await supabase

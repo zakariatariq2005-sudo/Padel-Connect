@@ -48,7 +48,7 @@ export default function ProfilePage() {
         }
         
         console.log('Profile data loaded:', profileData);
-        console.log('Nickname from profile:', profileData?.nickname);
+        console.log('Name from profile:', profileData?.name);
         setProfile(profileData);
         setSkillLevel(profileData?.skill_level || 'Beginner');
         setLoading(false);
@@ -213,9 +213,9 @@ export default function ProfilePage() {
               </div>
               <div>
                 <span className="text-neutral font-semibold text-lg">
-                  {profile?.nickname || 'Not set'}
+                  {profile?.name || 'Not set'}
                 </span>
-                {!profile?.nickname && (
+                {!profile?.name && (
                   <p className="text-sm text-gray-400 mt-1">
                     Name is set during signup and cannot be changed
                   </p>

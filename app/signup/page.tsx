@@ -44,11 +44,11 @@ export default function SignupPage() {
     }
     
     // Check uniqueness
-    // Note: This requires an RLS policy that allows unauthenticated users to check nickname availability
+    // Note: This requires an RLS policy that allows unauthenticated users to check name availability
     const { data, error } = await supabase
       .from('players')
-      .select('nickname')
-      .eq('nickname', trimmed)
+      .select('name')
+      .eq('name', trimmed)
       .limit(1);
     
     if (error) {
@@ -145,7 +145,7 @@ export default function SignupPage() {
       // Ensure all required fields are provided
       const profileData = {
         user_id: authData.user.id,
-        nickname: trimmedNickname,
+        name: trimmedNickname,
         skill_level: formData.skillLevel || 'Beginner',
         location: formData.location.trim() || 'Unknown',
         is_online: true,
@@ -162,7 +162,7 @@ export default function SignupPage() {
       if (profileError) {
         console.error('Profile creation error:', profileError);
         console.error('Profile data attempted:', profileData);
-        // Check if it's a unique constraint violation for nickname
+        // Check if it's a unique constraint violation for name
         if (profileError.code === '23505' || profileError.message.includes('unique')) {
           setNicknameError('This name is already taken');
         } else {
