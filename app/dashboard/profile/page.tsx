@@ -2,11 +2,16 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
-import Cropper from 'react-easy-crop';
 import LogoutButton from '@/components/LogoutButton';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
+
+// Dynamically import Cropper to avoid SSR issues
+const Cropper = dynamic(() => import('react-easy-crop').then((mod) => mod.default), {
+  ssr: false,
+});
 
 /**
  * Profile Page
