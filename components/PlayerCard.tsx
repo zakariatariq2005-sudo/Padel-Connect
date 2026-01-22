@@ -18,6 +18,22 @@ export default function PlayerCard({
   return (
     <div className="bg-dark-light rounded-lg shadow-lg p-5 hover:shadow-xl transition-shadow border border-dark-lighter text-center">
       <div className="mb-4">
+        {/* Profile Photo */}
+        <div className="flex justify-center mb-3">
+          {player.photo_url ? (
+            <img
+              src={player.photo_url}
+              alt={player.nickname || 'Player'}
+              className="w-16 h-16 rounded-full object-cover border-2 border-primary"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-dark-lighter flex items-center justify-center border-2 border-dark-lighter">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+          )}
+        </div>
         <div className="flex items-center justify-center gap-2 mb-2">
           <h3 className="text-lg font-heading font-semibold text-neutral">
             {player.nickname || 'Unknown Player'}

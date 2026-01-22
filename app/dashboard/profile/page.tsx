@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { uploadProfilePhoto } from '@/app/actions/upload';
 import LogoutButton from '@/components/LogoutButton';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
@@ -82,19 +83,49 @@ export default function ProfilePage() {
     fileInput?.click();
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+
+      // Show preview immediately
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      // TODO: Implement upload logic here
-      // - Upload file to storage (Supabase Storage or similar)
-      // - Get public URL
-      // - Update profile.photo_url in database
-      // - Refresh profile data
+
+      // Upload the file
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const result = await uploadProfilePhoto(formData);
+        
+        if (result.success) {
+          // Refresh profile data
+          const { data: profileData } = await supabase
+            .from('players')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (profileData) {
+            setProfile(profileData);
+            setSelectedImagePreview(null); // Clear preview since we have the real URL
+          }
+          router.refresh();
+        } else {
+          alert(result.error || 'Failed to upload photo');
+          setSelectedImagePreview(null);
+        }
+      } catch (err) {
+        console.error('Upload error:', err);
+        alert('Failed to upload photo');
+        setSelectedImagePreview(null);
+      }
     }
   };
 

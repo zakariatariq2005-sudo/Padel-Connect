@@ -206,6 +206,22 @@ export default function RequestsPage() {
                   className="bg-dark-light rounded-lg shadow p-5 border border-dark-lighter text-center"
                 >
                   <div className="mb-4">
+                    {/* Profile Photo */}
+                    <div className="flex justify-center mb-3">
+                      {request.sender?.photo_url ? (
+                        <img
+                          src={request.sender.photo_url}
+                          alt={request.sender.nickname || 'Player'}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-primary"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-dark-lighter flex items-center justify-center border-2 border-dark-lighter">
+                          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
                     <h3 className="text-lg font-semibold text-neutral mb-1">
                       {request.sender?.nickname || 'Unknown Player'}
                     </h3>
@@ -257,6 +273,22 @@ export default function RequestsPage() {
                   className="bg-dark-light rounded-lg shadow p-5 border border-dark-lighter text-center"
                 >
                   <div className="mb-4">
+                    {/* Profile Photo */}
+                    <div className="flex justify-center mb-3">
+                      {request.receiver?.photo_url ? (
+                        <img
+                          src={request.receiver.photo_url}
+                          alt={request.receiver.nickname || 'Player'}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-primary"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-dark-lighter flex items-center justify-center border-2 border-dark-lighter">
+                          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
                     <h3 className="text-lg font-semibold text-neutral mb-1">
                       {request.receiver?.nickname || 'Unknown Player'}
                     </h3>
@@ -328,6 +360,22 @@ export default function RequestsPage() {
                   className="bg-dark-light rounded-lg shadow p-5 border border-dark-lighter text-center"
                 >
                   <div className="mb-4">
+                    {/* Profile Photo */}
+                    <div className="flex justify-center mb-3">
+                      {match.opponent?.photo_url ? (
+                        <img
+                          src={match.opponent.photo_url}
+                          alt={match.opponent.nickname || 'Player'}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-primary"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-dark-lighter flex items-center justify-center border-2 border-dark-lighter">
+                          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
                     <h3 className="text-lg font-semibold text-neutral mb-1">
                       Match with {match.opponent?.nickname || 'Unknown Player'}
                     </h3>

@@ -160,8 +160,8 @@ export default function SignupPage() {
         return;
       }
 
-      // Redirect to dashboard on success
-      router.push('/dashboard');
+      // Redirect to add profile photo step (optional, can skip)
+      router.push('/add-profile-photo');
       router.refresh();
     } catch (err) {
       setError('An unexpected error occurred');

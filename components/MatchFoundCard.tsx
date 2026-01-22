@@ -63,11 +63,19 @@ export default function MatchFoundCard({
 
       <div className="glass-card p-5 mb-6 bg-dark-lighter/50">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent 
-                        flex items-center justify-center text-white font-bold text-xl
-                        shadow-lg shadow-primary/30">
-            {getAvatarInitials(opponent.nickname || '')}
-          </div>
+          {opponent.photo_url ? (
+            <img
+              src={opponent.photo_url}
+              alt={opponent.nickname || 'Player'}
+              className="w-16 h-16 rounded-full object-cover border-2 border-primary shadow-lg shadow-primary/30"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent 
+                          flex items-center justify-center text-white font-bold text-xl
+                          shadow-lg shadow-primary/30">
+              {getAvatarInitials(opponent.nickname || '')}
+            </div>
+          )}
           <div className="flex-1">
             <h4 className="text-xl font-heading font-semibold text-neutral mb-1">
               {opponent.nickname || 'Unknown Player'}

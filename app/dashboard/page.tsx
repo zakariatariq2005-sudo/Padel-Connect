@@ -169,9 +169,18 @@ export default function DashboardPage() {
                   key={request.id}
                   className="bg-dark-light rounded-lg shadow p-5 border border-dark-lighter text-center"
                 >
-                  <p className="font-medium text-neutral mb-2">
-                    You requested to play with {request.receiver?.nickname || 'Unknown Player'}
-                  </p>
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    {request.receiver?.photo_url && (
+                      <img
+                        src={request.receiver.photo_url}
+                        alt={request.receiver.nickname || 'Player'}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-primary"
+                      />
+                    )}
+                    <p className="font-medium text-neutral">
+                      You requested to play with {request.receiver?.nickname || 'Unknown Player'}
+                    </p>
+                  </div>
                   <span className="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
                     Pending
                   </span>
