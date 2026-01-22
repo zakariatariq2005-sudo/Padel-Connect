@@ -19,10 +19,6 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImagePreview, setSelectedImagePreview] = useState<string | null>(null);
-  const [editingNickname, setEditingNickname] = useState(false);
-  const [nickname, setNickname] = useState('');
-  const [nicknameError, setNicknameError] = useState<string | null>(null);
-  const [savingNickname, setSavingNickname] = useState(false);
   const [editingSkillLevel, setEditingSkillLevel] = useState(false);
   const [skillLevel, setSkillLevel] = useState('');
   const [editingLocation, setEditingLocation] = useState(false);
@@ -56,7 +52,6 @@ export default function ProfilePage() {
         console.log('Profile data loaded:', profileData);
         console.log('Nickname from profile:', profileData?.nickname);
         setProfile(profileData);
-        setNickname(profileData?.nickname || '');
         setSkillLevel(profileData?.skill_level || 'Beginner');
         setLocation(profileData?.location || '');
         setLoading(false);
@@ -135,145 +130,6 @@ export default function ProfilePage() {
   };
 
   const displayImage = selectedImagePreview || profile?.photo_url;
-
-  const validateNickname = async (nicknameValue: string): Promise<string | null> => {
-    const trimmed = nicknameValue.trim();
-    
-    if (!trimmed) {
-      return 'Nickname is required';
-    }
-    
-    if (trimmed.length < 3) {
-      return 'Nickname must be at least 3 characters';
-    }
-    
-    if (trimmed.length > 20) {
-      return 'Nickname must be 20 characters or less';
-    }
-    
-    // Check uniqueness (excluding current user)
-    if (!user) {
-      return 'Not authenticated';
-    }
-
-    const { data, error } = await supabase
-      .from('players')
-      .select('nickname, user_id')
-      .eq('nickname', trimmed)
-      .limit(1);
-    
-    if (error) {
-      console.error('Nickname validation error:', error);
-      // Don't block if it's an RLS/permission error - database will validate on save
-      return null;
-    }
-    
-    // Allow if it's the current user's nickname (no change) or if no one else has it
-    if (data && data.length > 0) {
-      const existingUser = data[0];
-      if (existingUser.user_id !== user.id) {
-        return 'This nickname is already taken';
-      }
-      // It's the current user's nickname - allow it
-    }
-    
-    return null;
-  };
-
-  const handleNicknameChange = async (value: string) => {
-    const trimmed = value.trim();
-    setNickname(value);
-    setNicknameError(null);
-    
-    if (trimmed.length > 0 && trimmed.length < 3) {
-      setNicknameError('Nickname must be at least 3 characters');
-      return;
-    }
-    
-    if (trimmed.length > 20) {
-      setNicknameError('Nickname must be 20 characters or less');
-      return;
-    }
-    
-    // Check uniqueness only if valid length
-    if (trimmed.length >= 3 && trimmed.length <= 20) {
-      const error = await validateNickname(trimmed);
-      if (error) {
-        setNicknameError(error);
-      }
-    }
-  };
-
-  const handleSaveNickname = async () => {
-    setNicknameError(null);
-    setSavingNickname(true);
-
-    try {
-      const trimmedNickname = nickname.trim();
-      if (!trimmedNickname) {
-        setNicknameError('Nickname is required');
-        setSavingNickname(false);
-        return;
-      }
-      
-      if (trimmedNickname.length < 3 || trimmedNickname.length > 20) {
-        setNicknameError('Nickname must be between 3 and 20 characters');
-        setSavingNickname(false);
-        return;
-      }
-      
-      const nicknameValidationError = await validateNickname(trimmedNickname);
-      if (nicknameValidationError) {
-        setNicknameError(nicknameValidationError);
-        setSavingNickname(false);
-        return;
-      }
-
-      console.log('Updating nickname:', trimmedNickname, 'for user:', user.id);
-      
-      const { data: updateData, error: updateError } = await supabase
-        .from('players')
-        .update({ nickname: trimmedNickname })
-        .eq('user_id', user.id)
-        .select();
-
-      if (updateError) {
-        console.error('Nickname update error:', updateError);
-        console.error('Error code:', updateError.code);
-        console.error('Error message:', updateError.message);
-        console.error('Error details:', updateError.details);
-        
-        if (updateError.code === '23505' || updateError.message.includes('unique') || updateError.message.includes('duplicate')) {
-          setNicknameError('This nickname is already taken');
-        } else if (updateError.code === '42501' || updateError.message.includes('permission') || updateError.message.includes('policy')) {
-          setNicknameError('Permission denied. Please check your database policies.');
-        } else {
-          setNicknameError(`Failed to update: ${updateError.message || 'Unknown error'}. Please try again.`);
-        }
-        setSavingNickname(false);
-        return;
-      }
-
-      console.log('Nickname updated successfully:', updateData);
-
-      // Update both profile and nickname state
-      setProfile({ ...profile, nickname: trimmedNickname });
-      setNickname(trimmedNickname);
-      setEditingNickname(false);
-      setSavingNickname(false);
-      setNicknameError(null);
-      // Don't refresh - just update local state
-    } catch (err) {
-      setNicknameError('An unexpected error occurred');
-      setSavingNickname(false);
-    }
-  };
-
-  const handleCancelEditNickname = () => {
-    setNickname(profile?.nickname || '');
-    setNicknameError(null);
-    setEditingNickname(false);
-  };
 
   const handleSaveSkillLevel = async () => {
     setSaving(true);
@@ -394,60 +250,17 @@ export default function ProfilePage() {
             <div className="py-3 border-b border-dark-lighter">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-gray-300 font-medium">Nickname</span>
-                {!editingNickname && (
-                  <button
-                    onClick={() => setEditingNickname(true)}
-                    className="text-primary text-sm hover:underline"
-                  >
-                    Edit
-                  </button>
+              </div>
+              <div>
+                <span className="text-neutral font-semibold text-lg">
+                  {profile?.nickname || 'Not set'}
+                </span>
+                {!profile?.nickname && (
+                  <p className="text-sm text-gray-400 mt-1">
+                    Nickname is set during signup and cannot be changed
+                  </p>
                 )}
               </div>
-              {editingNickname ? (
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    value={nickname}
-                    onChange={(e) => handleNicknameChange(e.target.value)}
-                    minLength={3}
-                    maxLength={20}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark ${
-                      nicknameError ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    placeholder="Choose a unique nickname (3-20 chars)"
-                  />
-                  {nicknameError && (
-                    <p className="text-sm text-red-600">{nicknameError}</p>
-                  )}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleSaveNickname}
-                      disabled={savingNickname || !!nicknameError || !nickname.trim()}
-                      className="px-4 py-2 bg-secondary text-neutral font-medium rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {savingNickname ? 'Saving...' : 'Save'}
-                    </button>
-                    <button
-                      onClick={handleCancelEditNickname}
-                      disabled={savingNickname}
-                      className="px-4 py-2 bg-gray-200 text-dark font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <span className="text-neutral font-semibold text-lg">
-                    {profile?.nickname || 'Not set'}
-                  </span>
-                  {!profile?.nickname && (
-                    <p className="text-sm text-gray-400 mt-1">
-                      Click Edit to set your nickname
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
             
             <div className="py-3 border-b border-dark-lighter">
