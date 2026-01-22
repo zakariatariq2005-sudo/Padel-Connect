@@ -55,11 +55,8 @@ export async function getUserProfile() {
     return newProfile;
   }
 
-  // Enforce nickname requirement - if missing, user must complete profile
-  if (!profile.nickname) {
-    redirect('/complete-profile');
-  }
-
+  // If nickname is missing, user can set it from profile page
+  // No longer blocking access - just return the profile
   return profile;
 }
 

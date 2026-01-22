@@ -49,12 +49,6 @@ export default function RequestsPage() {
           .single();
         
         setProfile(profileData);
-        
-        // Redirect to complete profile if no nickname
-        if (!profileData?.nickname) {
-          router.push('/complete-profile');
-          return;
-        }
 
         // Expire old requests
         await supabase

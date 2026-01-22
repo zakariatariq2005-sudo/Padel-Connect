@@ -46,9 +46,7 @@ export async function loginAction(formData: FormData) {
       .single();
     
     if (profile && !profile.nickname) {
-      // Profile exists but no nickname - redirect to complete profile
-      revalidatePath('/complete-profile');
-      redirect('/complete-profile');
+      // Profile exists but no nickname - allow access, can set from profile page
     }
     
     await supabase
@@ -63,12 +61,8 @@ export async function loginAction(formData: FormData) {
         user_id: authData.user.id,
         skill_level: 'Beginner',
         location: 'Unknown',
-        is_online: false, // Don't allow online until nickname is set
+        is_online: true, // Allow online - nickname can be set later
       });
-    
-    // Redirect to complete profile
-    revalidatePath('/complete-profile');
-    redirect('/complete-profile');
   }
 
   revalidatePath('/dashboard');

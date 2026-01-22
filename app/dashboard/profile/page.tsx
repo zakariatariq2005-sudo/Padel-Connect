@@ -46,13 +46,6 @@ export default function ProfilePage() {
         
         setProfile(profileData);
         setNickname(profileData?.nickname || '');
-        
-        // Redirect to complete profile if no nickname
-        if (!profileData?.nickname) {
-          router.push('/complete-profile');
-          return;
-        }
-        
         setLoading(false);
       } catch (error) {
         console.error('Error loading profile:', error);

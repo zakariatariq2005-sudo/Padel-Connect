@@ -52,9 +52,7 @@ export default function LoginPage() {
           .single();
         
         if (profile && !profile.nickname) {
-          // Profile exists but no nickname - redirect to complete profile
-          router.push('/complete-profile');
-          return;
+          // Profile exists but no nickname - allow access, can set from profile page
         }
         
         await supabase
@@ -69,12 +67,8 @@ export default function LoginPage() {
             user_id: authData.user.id,
             skill_level: 'Beginner',
             location: 'Unknown',
-            is_online: false, // Don't allow online until nickname is set
+            is_online: true, // Allow online - nickname can be set later
           });
-        
-        // Redirect to complete profile
-        router.push('/complete-profile');
-        return;
       }
 
       // Wait for session to be fully established

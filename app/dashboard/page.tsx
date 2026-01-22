@@ -61,18 +61,8 @@ export default function DashboardPage() {
             .single();
           
           setProfile(newProfile || null);
-          // Redirect to complete profile if no nickname
-          if (!newProfile?.nickname) {
-            router.push('/complete-profile');
-            return;
-          }
         } else {
           setProfile(profileData);
-          // Redirect to complete profile if no nickname
-          if (!profileData.nickname) {
-            router.push('/complete-profile');
-            return;
-          }
         }
 
         // Load online players (only those with nicknames)

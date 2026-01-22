@@ -42,12 +42,7 @@ export default function AddProfilePhotoPage() {
           .single();
 
         if (!profileData) {
-          router.push('/complete-profile');
-          return;
-        }
-
-        if (!profileData.nickname) {
-          router.push('/complete-profile');
+          router.push('/dashboard');
           return;
         }
 

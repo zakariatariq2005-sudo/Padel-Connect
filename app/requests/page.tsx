@@ -23,10 +23,7 @@ export default async function RequestsDashboardPage() {
   const profile = await getUserProfile();
   const supabase = await createClient();
 
-  // Check if user has nickname
-  if (!profile?.nickname) {
-    redirect('/complete-profile');
-  }
+  // Note: Nickname is optional - user can set it from profile page if needed
 
   // Expire old requests first
   await supabase
