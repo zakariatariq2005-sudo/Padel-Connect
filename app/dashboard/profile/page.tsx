@@ -121,7 +121,6 @@ export default function ProfilePage() {
             setProfile(profileData);
             setSelectedImagePreview(null); // Clear preview since we have the real URL
           }
-          router.refresh();
         } else {
           alert(result.error || 'Failed to upload photo');
           setSelectedImagePreview(null);
