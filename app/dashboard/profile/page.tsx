@@ -343,7 +343,7 @@ export default function ProfilePage() {
               onClick={handleAvatarClick}
               className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-dark-lighter hover:border-primary transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-dark-light"
             >
-              {displayImage ? (
+              {isClient && displayImage ? (
                 <img
                   src={displayImage}
                   alt="Profile"
