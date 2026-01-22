@@ -9,9 +9,13 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 
 // Dynamically import Cropper to avoid SSR issues
-const Cropper = dynamic(() => import('react-easy-crop').then((mod) => mod.default), {
-  ssr: false,
-});
+const Cropper = dynamic(
+  () => import('react-easy-crop').then((mod) => mod.default),
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-96 bg-dark rounded-lg flex items-center justify-center text-gray-400">Loading cropper...</div>
+  }
+) as any;
 
 /**
  * Profile Page
