@@ -21,8 +21,6 @@ export default function ProfilePage() {
   const [selectedImagePreview, setSelectedImagePreview] = useState<string | null>(null);
   const [editingSkillLevel, setEditingSkillLevel] = useState(false);
   const [skillLevel, setSkillLevel] = useState('');
-  const [editingLocation, setEditingLocation] = useState(false);
-  const [location, setLocation] = useState('');
   const [saving, setSaving] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -53,7 +51,6 @@ export default function ProfilePage() {
         console.log('Nickname from profile:', profileData?.nickname);
         setProfile(profileData);
         setSkillLevel(profileData?.skill_level || 'Beginner');
-        setLocation(profileData?.location || '');
         setLoading(false);
       } catch (error) {
         console.error('Error loading profile:', error);
@@ -155,46 +152,9 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSaveLocation = async () => {
-    setSaving(true);
-    try {
-      const trimmedLocation = location.trim();
-      if (!trimmedLocation) {
-        alert('Location cannot be empty');
-        setSaving(false);
-        return;
-      }
-
-      const { error: updateError } = await supabase
-        .from('players')
-        .update({ location: trimmedLocation })
-        .eq('user_id', user.id);
-
-      if (updateError) {
-        alert('Failed to update location. Please try again.');
-        setSaving(false);
-        return;
-      }
-
-      setProfile({ ...profile, location: trimmedLocation });
-      setLocation(trimmedLocation);
-      setEditingLocation(false);
-      setSaving(false);
-      // Don't refresh - just update local state
-    } catch (err) {
-      alert('An unexpected error occurred');
-      setSaving(false);
-    }
-  };
-
   const handleCancelEditSkillLevel = () => {
     setSkillLevel(profile?.skill_level || 'Beginner');
     setEditingSkillLevel(false);
-  };
-
-  const handleCancelEditLocation = () => {
-    setLocation(profile?.location || '');
-    setEditingLocation(false);
   };
 
   return (
@@ -311,45 +271,18 @@ export default function ProfilePage() {
             
             <div className="py-3 border-b border-dark-lighter">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-300 font-medium">City</span>
-                {!editingLocation && (
-                  <button
-                    onClick={() => setEditingLocation(true)}
-                    className="text-primary text-sm hover:underline"
-                  >
-                    Edit
-                  </button>
+                <span className="text-gray-300 font-medium">Location</span>
+              </div>
+              <div>
+                <span className="text-neutral font-semibold text-lg">
+                  {profile?.location || 'Not set'}
+                </span>
+                {!profile?.location && (
+                  <p className="text-sm text-gray-400 mt-1">
+                    Location is set during signup and cannot be changed
+                  </p>
                 )}
               </div>
-              {editingLocation ? (
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark"
-                    placeholder="Enter your city"
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleSaveLocation}
-                      disabled={saving || !location.trim()}
-                      className="px-4 py-2 bg-secondary text-neutral font-medium rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {saving ? 'Saving...' : 'Save'}
-                    </button>
-                    <button
-                      onClick={handleCancelEditLocation}
-                      disabled={saving}
-                      className="px-4 py-2 bg-gray-200 text-dark font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <span className="text-neutral font-semibold">{profile?.location || 'Not set'}</span>
-              )}
             </div>
             
             <div className="flex justify-between items-center py-3">
