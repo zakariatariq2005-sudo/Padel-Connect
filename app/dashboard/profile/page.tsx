@@ -96,27 +96,88 @@ export default function ProfilePage() {
       };
       reader.readAsDataURL(file);
 
-      // Upload the file
+      // Upload the file directly using client-side Supabase
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-        const result = await uploadProfilePhoto(formData);
-        
-        if (result.success) {
-          // Refresh profile data
-          const { data: profileData } = await supabase
-            .from('players')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
-          
-          if (profileData) {
-            setProfile(profileData);
-            setSelectedImagePreview(null); // Clear preview since we have the real URL
-          }
-        } else {
-          alert(result.error || 'Failed to upload photo');
+        if (!user) {
+          alert('Not authenticated. Please log in again.');
           setSelectedImagePreview(null);
+          return;
+        }
+
+        // Get old photo URL before uploading new one
+        const { data: oldProfile } = await supabase
+          .from('players')
+          .select('photo_url')
+          .eq('user_id', user.id)
+          .single();
+
+        // Generate unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `profile-photos/${fileName}`;
+
+        // Upload to Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          alert(uploadError.message || 'Failed to upload image');
+          setSelectedImagePreview(null);
+          return;
+        }
+
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+
+        const photoUrl = urlData.publicUrl;
+
+        // Update player profile with photo URL
+        const { error: updateError } = await supabase
+          .from('players')
+          .update({ photo_url: photoUrl })
+          .eq('user_id', user.id);
+
+        if (updateError) {
+          // If update fails, try to delete the uploaded file
+          await supabase.storage.from('avatars').remove([filePath]);
+          alert('Failed to update profile with photo URL');
+          setSelectedImagePreview(null);
+          return;
+        }
+
+        // Delete old photo if it exists and is different
+        if (oldProfile?.photo_url && oldProfile.photo_url !== photoUrl) {
+          try {
+            // Extract file path from old URL
+            const oldUrl = oldProfile.photo_url;
+            const urlParts = oldUrl.split('/storage/v1/object/public/avatars/');
+            if (urlParts.length > 1) {
+              const oldPath = urlParts[1];
+              await supabase.storage.from('avatars').remove([oldPath]);
+            }
+          } catch (deleteError) {
+            // Log but don't fail - old photo cleanup is not critical
+            console.error('Error deleting old photo:', deleteError);
+          }
+        }
+
+        // Refresh profile data
+        const { data: profileData } = await supabase
+          .from('players')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (profileData) {
+          setProfile(profileData);
+          setSelectedImagePreview(null); // Clear preview since we have the real URL
         }
       } catch (err) {
         console.error('Upload error:', err);
