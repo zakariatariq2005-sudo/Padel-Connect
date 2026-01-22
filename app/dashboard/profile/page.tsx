@@ -228,20 +228,32 @@ export default function ProfilePage() {
         return;
       }
 
-      const { error: updateError } = await supabase
+      console.log('Updating nickname:', trimmedNickname, 'for user:', user.id);
+      
+      const { data: updateData, error: updateError } = await supabase
         .from('players')
         .update({ nickname: trimmedNickname })
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .select();
 
       if (updateError) {
-        if (updateError.code === '23505' || updateError.message.includes('unique')) {
+        console.error('Nickname update error:', updateError);
+        console.error('Error code:', updateError.code);
+        console.error('Error message:', updateError.message);
+        console.error('Error details:', updateError.details);
+        
+        if (updateError.code === '23505' || updateError.message.includes('unique') || updateError.message.includes('duplicate')) {
           setNicknameError('This nickname is already taken');
+        } else if (updateError.code === '42501' || updateError.message.includes('permission') || updateError.message.includes('policy')) {
+          setNicknameError('Permission denied. Please check your database policies.');
         } else {
-          setNicknameError('Failed to update nickname. Please try again.');
+          setNicknameError(`Failed to update: ${updateError.message || 'Unknown error'}. Please try again.`);
         }
         setSavingNickname(false);
         return;
       }
+
+      console.log('Nickname updated successfully:', updateData);
 
       setProfile({ ...profile, nickname: trimmedNickname });
       setEditingNickname(false);
