@@ -47,3 +47,4 @@ EXECUTE FUNCTION trim_nickname();
 -- ORDER BY created_at DESC 
 -- LIMIT 10;
 
+

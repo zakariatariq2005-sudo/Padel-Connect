@@ -159,3 +159,4 @@ The `players` table now has:
 - User IDs are **never shown in UI**
 - All user-to-user interactions use **nickname only**
 
+

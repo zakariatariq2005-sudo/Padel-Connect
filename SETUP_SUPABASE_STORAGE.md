@@ -101,3 +101,4 @@ ADD COLUMN IF NOT EXISTS photo_url TEXT;
 - Verify the URL is accessible (try opening it in a browser)
 - Check browser console for CORS or loading errors
 
+

@@ -19,3 +19,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_players_nickname_unique ON players(nicknam
 -- ALTER TABLE players ALTER COLUMN nickname SET NOT NULL;
 -- But we'll handle this through the application flow to avoid breaking existing users.
 
+

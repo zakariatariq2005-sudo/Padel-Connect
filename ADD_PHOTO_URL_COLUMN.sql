@@ -14,3 +14,4 @@ COMMENT ON COLUMN players.photo_url IS 'URL of the profile photo stored in Supab
 -- ORDER BY created_at DESC 
 -- LIMIT 10;
 
+

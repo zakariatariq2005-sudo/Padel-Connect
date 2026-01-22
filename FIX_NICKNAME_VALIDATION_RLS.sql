@@ -19,3 +19,4 @@ CREATE POLICY "Anyone can check nickname availability"
 --
 -- This only allows selecting the nickname column, not other sensitive fields.
 
+

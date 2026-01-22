@@ -54,6 +54,7 @@ export default function ProfilePage() {
         }
         
         console.log('Profile data loaded:', profileData);
+        console.log('Nickname from profile:', profileData?.nickname);
         setProfile(profileData);
         setNickname(profileData?.nickname || '');
         setSkillLevel(profileData?.skill_level || 'Beginner');
@@ -255,9 +256,12 @@ export default function ProfilePage() {
 
       console.log('Nickname updated successfully:', updateData);
 
+      // Update both profile and nickname state
       setProfile({ ...profile, nickname: trimmedNickname });
+      setNickname(trimmedNickname);
       setEditingNickname(false);
       setSavingNickname(false);
+      setNicknameError(null);
       // Don't refresh - just update local state
     } catch (err) {
       setNicknameError('An unexpected error occurred');
@@ -433,7 +437,16 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ) : (
-                <span className="text-neutral font-semibold">{profile?.nickname || 'Not set'}</span>
+                <div>
+                  <span className="text-neutral font-semibold text-lg">
+                    {profile?.nickname || 'Not set'}
+                  </span>
+                  {!profile?.nickname && (
+                    <p className="text-sm text-gray-400 mt-1">
+                      Click Edit to set your nickname
+                    </p>
+                  )}
+                </div>
               )}
             </div>
             
