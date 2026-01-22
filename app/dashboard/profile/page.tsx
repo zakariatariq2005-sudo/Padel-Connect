@@ -125,7 +125,16 @@ export default function ProfilePage() {
 
         if (uploadError) {
           console.error('Upload error:', uploadError);
-          alert(uploadError.message || 'Failed to upload image');
+          
+          // Provide helpful error messages
+          if (uploadError.message?.includes('bucket') || uploadError.message?.includes('not found')) {
+            alert('Storage bucket not found. Please create an "avatars" bucket in Supabase Storage. See SETUP_STORAGE_BUCKET.md for instructions.');
+          } else if (uploadError.message?.includes('permission') || uploadError.message?.includes('denied')) {
+            alert('Permission denied. Please check your Supabase Storage policies. See SETUP_STORAGE_BUCKET.md for instructions.');
+          } else {
+            alert(uploadError.message || 'Failed to upload image');
+          }
+          
           setSelectedImagePreview(null);
           return;
         }
