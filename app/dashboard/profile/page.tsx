@@ -458,7 +458,7 @@ export default function ProfilePage() {
             
             <div className="flex justify-between items-center py-3">
               <span className="text-gray-300 font-medium">Email</span>
-              <span className="text-neutral font-semibold">{user.email}</span>
+              <span className="text-neutral font-semibold">{user?.email || 'Not available'}</span>
             </div>
           </div>
 
