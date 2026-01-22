@@ -10,31 +10,38 @@ import { revalidatePath } from 'next/cache';
  * @returns Success status and photo URL or error message
  */
 export async function uploadProfilePhoto(formData: FormData) {
-  const supabase = await createClient();
-  
-  // Get current user
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return { success: false, error: 'Not authenticated' };
-  }
-
-  const file = formData.get('file') as File;
-  if (!file) {
-    return { success: false, error: 'No file provided' };
-  }
-
-  // Validate file type
-  if (!file.type.startsWith('image/')) {
-    return { success: false, error: 'File must be an image' };
-  }
-
-  // Validate file size (max 5MB)
-  const maxSize = 5 * 1024 * 1024; // 5MB
-  if (file.size > maxSize) {
-    return { success: false, error: 'File size must be less than 5MB' };
-  }
-
   try {
+    const supabase = await createClient();
+    
+    // Get current user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError) {
+      console.error('Auth error in upload:', authError);
+      return { success: false, error: `Authentication error: ${authError.message}` };
+    }
+    
+    if (!user) {
+      console.error('No user found in upload');
+      return { success: false, error: 'Not authenticated. Please log in again.' };
+    }
+
+    const file = formData.get('file') as File;
+    if (!file) {
+      return { success: false, error: 'No file provided' };
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      return { success: false, error: 'File must be an image' };
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      return { success: false, error: 'File size must be less than 5MB' };
+    }
+
     // Get old photo URL before uploading new one
     const { data: oldProfile } = await supabase
       .from('players')
@@ -100,8 +107,8 @@ export async function uploadProfilePhoto(formData: FormData) {
 
     return { success: true, photoUrl };
   } catch (error) {
-    console.error('Unexpected error:', error);
-    return { success: false, error: 'An unexpected error occurred' };
+    console.error('Unexpected error in upload:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    return { success: false, error: errorMessage };
   }
 }
-
