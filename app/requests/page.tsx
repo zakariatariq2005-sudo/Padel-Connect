@@ -23,6 +23,11 @@ export default async function RequestsDashboardPage() {
   const profile = await getUserProfile();
   const supabase = await createClient();
 
+  // Check if user has nickname
+  if (!profile?.nickname) {
+    redirect('/complete-profile');
+  }
+
   // Expire old requests first
   await supabase
     .from('match_requests')

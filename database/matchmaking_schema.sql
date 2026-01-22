@@ -143,3 +143,5 @@ $$ LANGUAGE plpgsql;
 GRANT EXECUTE ON FUNCTION can_send_request(UUID, UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION expire_old_match_requests() TO authenticated;
 
+
+

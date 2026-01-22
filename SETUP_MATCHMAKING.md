@@ -159,3 +159,5 @@ Make sure you have the following RLS policies (from `SUPABASE_SETUP.md`):
 6. 🔄 Add push notifications (optional)
 7. 🔄 Implement chat in matches (optional)
 
+
+

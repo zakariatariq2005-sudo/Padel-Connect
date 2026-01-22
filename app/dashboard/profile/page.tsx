@@ -18,6 +18,10 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImagePreview, setSelectedImagePreview] = useState<string | null>(null);
+  const [editingNickname, setEditingNickname] = useState(false);
+  const [nickname, setNickname] = useState('');
+  const [nicknameError, setNicknameError] = useState<string | null>(null);
+  const [savingNickname, setSavingNickname] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -40,6 +44,14 @@ export default function ProfilePage() {
           .single();
         
         setProfile(profileData);
+        setNickname(profileData?.nickname || '');
+        
+        // Redirect to complete profile if no nickname
+        if (!profileData?.nickname) {
+          router.push('/complete-profile');
+          return;
+        }
+        
         setLoading(false);
       } catch (error) {
         console.error('Error loading profile:', error);
@@ -87,6 +99,120 @@ export default function ProfilePage() {
   };
 
   const displayImage = selectedImagePreview || profile?.photo_url;
+
+  const validateNickname = async (nicknameValue: string): Promise<string | null> => {
+    const trimmed = nicknameValue.trim();
+    
+    if (!trimmed) {
+      return 'Nickname is required';
+    }
+    
+    if (trimmed.length < 3) {
+      return 'Nickname must be at least 3 characters';
+    }
+    
+    if (trimmed.length > 20) {
+      return 'Nickname must be 20 characters or less';
+    }
+    
+    // Check uniqueness (excluding current user)
+    const { data, error } = await supabase
+      .from('players')
+      .select('nickname, user_id')
+      .eq('nickname', trimmed)
+      .limit(1);
+    
+    if (error) {
+      return 'Error checking nickname availability';
+    }
+    
+    // Allow if it's the current user's nickname (no change)
+    if (data && data.length > 0 && data[0].user_id !== user.id) {
+      return 'This nickname is already taken';
+    }
+    
+    return null;
+  };
+
+  const handleNicknameChange = async (value: string) => {
+    const trimmed = value.trim();
+    setNickname(value);
+    setNicknameError(null);
+    
+    if (trimmed.length > 0 && trimmed.length < 3) {
+      setNicknameError('Nickname must be at least 3 characters');
+      return;
+    }
+    
+    if (trimmed.length > 20) {
+      setNicknameError('Nickname must be 20 characters or less');
+      return;
+    }
+    
+    // Check uniqueness only if valid length
+    if (trimmed.length >= 3 && trimmed.length <= 20) {
+      const error = await validateNickname(trimmed);
+      if (error) {
+        setNicknameError(error);
+      }
+    }
+  };
+
+  const handleSaveNickname = async () => {
+    setNicknameError(null);
+    setSavingNickname(true);
+
+    try {
+      const trimmedNickname = nickname.trim();
+      if (!trimmedNickname) {
+        setNicknameError('Nickname is required');
+        setSavingNickname(false);
+        return;
+      }
+      
+      if (trimmedNickname.length < 3 || trimmedNickname.length > 20) {
+        setNicknameError('Nickname must be between 3 and 20 characters');
+        setSavingNickname(false);
+        return;
+      }
+      
+      const nicknameValidationError = await validateNickname(trimmedNickname);
+      if (nicknameValidationError) {
+        setNicknameError(nicknameValidationError);
+        setSavingNickname(false);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from('players')
+        .update({ nickname: trimmedNickname })
+        .eq('user_id', user.id);
+
+      if (updateError) {
+        if (updateError.code === '23505' || updateError.message.includes('unique')) {
+          setNicknameError('This nickname is already taken');
+        } else {
+          setNicknameError('Failed to update nickname. Please try again.');
+        }
+        setSavingNickname(false);
+        return;
+      }
+
+      setProfile({ ...profile, nickname: trimmedNickname });
+      setEditingNickname(false);
+      setSavingNickname(false);
+      router.refresh();
+    } catch (err) {
+      setNicknameError('An unexpected error occurred');
+      setSavingNickname(false);
+    }
+  };
+
+  const handleCancelEditNickname = () => {
+    setNickname(profile?.nickname || '');
+    setNicknameError(null);
+    setEditingNickname(false);
+  };
 
   return (
     <div className="min-h-screen bg-dark pb-20 md:pb-0">
@@ -138,9 +264,54 @@ export default function ProfilePage() {
           </h2>
           
           <div className="space-y-4 mb-8">
-            <div className="flex justify-between items-center py-3 border-b border-dark-lighter">
-              <span className="text-gray-300 font-medium">Name</span>
-              <span className="text-neutral font-semibold">{profile?.name || 'Not set'}</span>
+            <div className="py-3 border-b border-dark-lighter">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-300 font-medium">Nickname</span>
+                {!editingNickname && (
+                  <button
+                    onClick={() => setEditingNickname(true)}
+                    className="text-primary text-sm hover:underline"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+              {editingNickname ? (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={nickname}
+                    onChange={(e) => handleNicknameChange(e.target.value)}
+                    minLength={3}
+                    maxLength={20}
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
+                      nicknameError ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Choose a unique nickname (3-20 chars)"
+                  />
+                  {nicknameError && (
+                    <p className="text-sm text-red-600">{nicknameError}</p>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveNickname}
+                      disabled={savingNickname || !!nicknameError || !nickname.trim()}
+                      className="px-4 py-2 bg-secondary text-neutral font-medium rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {savingNickname ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      onClick={handleCancelEditNickname}
+                      disabled={savingNickname}
+                      className="px-4 py-2 bg-gray-200 text-dark font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <span className="text-neutral font-semibold">{profile?.nickname || 'Not set'}</span>
+              )}
             </div>
             
             <div className="flex justify-between items-center py-3 border-b border-dark-lighter">

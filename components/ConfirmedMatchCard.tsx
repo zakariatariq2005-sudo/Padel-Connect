@@ -32,7 +32,7 @@ export default function ConfirmedMatchCard({
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="text-xl font-heading font-semibold text-neutral">
-              Match with {opponent?.name || 'Unknown Player'}
+              Match with {opponent?.nickname || 'Unknown Player'}
             </h3>
             <span className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full">
               {match.status === 'waiting' ? 'Waiting' : 'In Progress'}
@@ -71,4 +71,6 @@ export default function ConfirmedMatchCard({
     </div>
   );
 }
+
+
 

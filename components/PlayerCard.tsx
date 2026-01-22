@@ -20,7 +20,7 @@ export default function PlayerCard({
       <div className="mb-4">
         <div className="flex items-center justify-center gap-2 mb-2">
           <h3 className="text-lg font-heading font-semibold text-neutral">
-            {player.name}
+            {player.nickname || 'Unknown Player'}
           </h3>
           <span className="w-2 h-2 bg-secondary rounded-full" title="Online"></span>
         </div>

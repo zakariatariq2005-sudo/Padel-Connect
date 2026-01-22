@@ -47,7 +47,7 @@ export default function ActiveMatchSection({
             Active Match
           </h3>
           <p className="text-gray-300">
-            Playing with <span className="font-semibold text-neutral">{opponent.name}</span>
+            Playing with <span className="font-semibold text-neutral">{opponent.nickname || 'Unknown Player'}</span>
           </p>
         </div>
         <span
@@ -62,7 +62,7 @@ export default function ActiveMatchSection({
       <div className="glass-card p-4 mb-4 bg-dark-lighter/50">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-semibold text-neutral mb-1">{opponent.name}</p>
+            <p className="font-semibold text-neutral mb-1">{opponent.nickname || 'Unknown Player'}</p>
             <div className="flex items-center gap-3 text-sm text-gray-400">
               {opponent.skill_level && (
                 <span className="skill-badge-intermediate">

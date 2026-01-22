@@ -97,7 +97,7 @@ export default function LiveMatchClient({
               </span>
             </div>
             <h2 className="text-2xl font-heading font-bold text-dark mb-2">
-              {currentPlayer?.name || 'Player 1'}
+              {currentPlayer?.nickname || 'Player 1'}
             </h2>
             <div className="space-y-2 text-sm text-gray-600">
               <p>
@@ -119,7 +119,7 @@ export default function LiveMatchClient({
               </span>
             </div>
             <h2 className="text-2xl font-heading font-bold text-dark mb-2">
-              {opponent?.name || 'Player 2'}
+              {opponent?.nickname || 'Player 2'}
             </h2>
             <div className="space-y-2 text-sm text-gray-600">
               <p>

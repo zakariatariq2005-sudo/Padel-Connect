@@ -9,28 +9,110 @@ import { createClient } from '@/lib/supabase/client';
  * Signup Page Component
  * 
  * This page allows new users to create an account with email, password,
- * name, skill level, and location. After signup, a player profile is created
+ * nickname, skill level, and location. After signup, a player profile is created
  * and the user is automatically logged in and redirected to the dashboard.
+ * 
+ * Nickname is the ONLY public identity - no full names are collected.
  */
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    name: '',
+    nickname: '',
     skillLevel: 'Beginner',
     location: '',
   });
   const [error, setError] = useState<string | null>(null);
+  const [nicknameError, setNicknameError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
+  const validateNickname = async (nickname: string): Promise<string | null> => {
+    const trimmed = nickname.trim();
+    
+    if (!trimmed) {
+      return 'Nickname is required';
+    }
+    
+    if (trimmed.length < 3) {
+      return 'Nickname must be at least 3 characters';
+    }
+    
+    if (trimmed.length > 20) {
+      return 'Nickname must be 20 characters or less';
+    }
+    
+    // Check uniqueness
+    const { data, error } = await supabase
+      .from('players')
+      .select('nickname')
+      .eq('nickname', trimmed)
+      .limit(1);
+    
+    if (error) {
+      return 'Error checking nickname availability';
+    }
+    
+    if (data && data.length > 0) {
+      return 'This nickname is already taken';
+    }
+    
+    return null;
+  };
+
+  const handleNicknameChange = async (value: string) => {
+    const trimmed = value.trim();
+    setFormData({ ...formData, nickname: value });
+    setNicknameError(null);
+    
+    if (trimmed.length > 0 && trimmed.length < 3) {
+      setNicknameError('Nickname must be at least 3 characters');
+      return;
+    }
+    
+    if (trimmed.length > 20) {
+      setNicknameError('Nickname must be 20 characters or less');
+      return;
+    }
+    
+    // Check uniqueness only if valid length
+    if (trimmed.length >= 3 && trimmed.length <= 20) {
+      const error = await validateNickname(trimmed);
+      if (error) {
+        setNicknameError(error);
+      }
+    }
+  };
+
   const handleSignup = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+    setNicknameError(null);
     setLoading(true);
 
     try {
+      // Validate nickname
+      const trimmedNickname = formData.nickname.trim();
+      if (!trimmedNickname) {
+        setNicknameError('Nickname is required');
+        setLoading(false);
+        return;
+      }
+      
+      if (trimmedNickname.length < 3 || trimmedNickname.length > 20) {
+        setNicknameError('Nickname must be between 3 and 20 characters');
+        setLoading(false);
+        return;
+      }
+      
+      const nicknameValidationError = await validateNickname(trimmedNickname);
+      if (nicknameValidationError) {
+        setNicknameError(nicknameValidationError);
+        setLoading(false);
+        return;
+      }
+
       // Create the user account with email and password
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
@@ -54,14 +136,19 @@ export default function SignupPage() {
         .from('players')
         .insert({
           user_id: authData.user.id,
-          name: formData.name,
+          nickname: trimmedNickname,
           skill_level: formData.skillLevel,
           location: formData.location,
           is_online: true,
         });
 
       if (profileError) {
-        setError('Account created but failed to create profile. Please try logging in.');
+        // Check if it's a unique constraint violation for nickname
+        if (profileError.code === '23505' || profileError.message.includes('unique')) {
+          setNicknameError('This nickname is already taken');
+        } else {
+          setError('Account created but failed to create profile. Please try logging in.');
+        }
         setLoading(false);
         return;
       }
@@ -86,18 +173,28 @@ export default function SignupPage() {
 
           <form onSubmit={handleSignup} className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-dark mb-2">
-                Full Name
+              <label htmlFor="nickname" className="block text-sm font-medium text-dark mb-2">
+                Nickname <span className="text-red-500">*</span>
               </label>
               <input
-                id="name"
+                id="nickname"
                 type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                value={formData.nickname}
+                onChange={(e) => handleNicknameChange(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
-                placeholder="John Doe"
+                minLength={3}
+                maxLength={20}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
+                  nicknameError ? 'border-red-300' : 'border-gray-300'
+                }`}
+                placeholder="Choose a unique nickname (3-20 chars)"
               />
+              {nicknameError && (
+                <p className="mt-1 text-sm text-red-600">{nicknameError}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-500">
+                This will be your public display name. Must be unique.
+              </p>
             </div>
 
             <div>

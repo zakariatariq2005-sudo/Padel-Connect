@@ -52,7 +52,7 @@ export default function MatchRequestsSection({
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex-1">
                     <p className="font-semibold text-neutral mb-1">
-                      {request.sender?.name || 'Unknown Player'} wants to play with you
+                      {request.sender?.nickname || 'Unknown Player'} wants to play with you
                     </p>
                     <div className="flex items-center gap-3 text-sm text-gray-400">
                       {request.sender?.skill_level && (
@@ -98,7 +98,7 @@ export default function MatchRequestsSection({
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex-1">
                     <p className="font-semibold text-neutral mb-1">
-                      You requested to play with {request.receiver?.name || 'Unknown Player'}
+                      You requested to play with {request.receiver?.nickname || 'Unknown Player'}
                     </p>
                     <div className="flex items-center gap-3 text-sm text-gray-400">
                       {request.receiver?.skill_level && (

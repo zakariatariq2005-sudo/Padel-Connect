@@ -66,7 +66,7 @@ export default function MatchRequestCard({
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="text-lg font-heading font-semibold text-dark">
-              {player?.name || 'Unknown Player'}
+              {player?.nickname || 'Unknown Player'}
             </h3>
             {getStatusBadge()}
           </div>
@@ -127,4 +127,6 @@ export default function MatchRequestCard({
     </div>
   );
 }
+
+
 

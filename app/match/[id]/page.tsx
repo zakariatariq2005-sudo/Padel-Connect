@@ -32,6 +32,17 @@ export default async function LiveMatchPage({ params }: { params: { id: string }
     redirect('/dashboard');
   }
 
+  // Check if user has nickname
+  const { data: userProfile } = await supabase
+    .from('players')
+    .select('nickname')
+    .eq('user_id', user.id)
+    .single();
+  
+  if (!userProfile?.nickname) {
+    redirect('/complete-profile');
+  }
+
   // Fetch player profiles
   const { data: players } = await supabase
     .from('players')

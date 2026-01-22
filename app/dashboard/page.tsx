@@ -53,26 +53,36 @@ export default function DashboardPage() {
             .from('players')
             .insert({
               user_id: authUser.id,
-              name: authUser.email?.split('@')[0] || 'Player',
               skill_level: 'Beginner',
               location: 'Unknown',
-              is_online: true,
+              is_online: false, // Don't allow online until nickname is set
             })
             .select()
             .single();
           
           setProfile(newProfile || null);
+          // Redirect to complete profile if no nickname
+          if (!newProfile?.nickname) {
+            router.push('/complete-profile');
+            return;
+          }
         } else {
           setProfile(profileData);
+          // Redirect to complete profile if no nickname
+          if (!profileData.nickname) {
+            router.push('/complete-profile');
+            return;
+          }
         }
 
-        // Load online players
+        // Load online players (only those with nicknames)
         const { data: playersData } = await supabase
           .from('players')
           .select('*')
           .eq('is_online', true)
           .neq('user_id', authUser.id)
-          .order('name', { ascending: true });
+          .not('nickname', 'is', null)
+          .order('nickname', { ascending: true });
 
         setPlayers(playersData || []);
 
@@ -160,7 +170,7 @@ export default function DashboardPage() {
                   className="bg-dark-light rounded-lg shadow p-5 border border-dark-lighter text-center"
                 >
                   <p className="font-medium text-neutral mb-2">
-                    You requested to play with {request.receiver?.name || 'Unknown Player'}
+                    You requested to play with {request.receiver?.nickname || 'Unknown Player'}
                   </p>
                   <span className="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
                     Pending

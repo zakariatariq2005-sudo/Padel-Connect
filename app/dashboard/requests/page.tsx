@@ -49,6 +49,12 @@ export default function RequestsPage() {
           .single();
         
         setProfile(profileData);
+        
+        // Redirect to complete profile if no nickname
+        if (!profileData?.nickname) {
+          router.push('/complete-profile');
+          return;
+        }
 
         // Expire old requests
         await supabase
@@ -201,7 +207,7 @@ export default function RequestsPage() {
                 >
                   <div className="mb-4">
                     <h3 className="text-lg font-semibold text-neutral mb-1">
-                      {request.sender?.name || 'Unknown Player'}
+                      {request.sender?.nickname || 'Unknown Player'}
                     </h3>
                     <div className="space-y-1 text-sm text-gray-300">
                       <p><span className="font-medium">Skill:</span> {request.sender?.skill_level || 'N/A'}</p>
@@ -252,7 +258,7 @@ export default function RequestsPage() {
                 >
                   <div className="mb-4">
                     <h3 className="text-lg font-semibold text-neutral mb-1">
-                      {request.receiver?.name || 'Unknown Player'}
+                      {request.receiver?.nickname || 'Unknown Player'}
                     </h3>
                     <div className="space-y-1 text-sm text-gray-300">
                       <p><span className="font-medium">Skill:</span> {request.receiver?.skill_level || 'N/A'}</p>
@@ -296,7 +302,7 @@ export default function RequestsPage() {
                       key={request.id}
                       className="bg-dark-light rounded-lg shadow p-4 border border-dark-lighter text-center"
                     >
-                      <p className="font-medium text-neutral mb-2">{request.receiver?.name || 'Unknown Player'}</p>
+                      <p className="font-medium text-neutral mb-2">{request.receiver?.nickname || 'Unknown Player'}</p>
                       <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusColors[request.status] || 'bg-gray-100 text-gray-800'}`}>
                         {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                       </span>
@@ -323,7 +329,7 @@ export default function RequestsPage() {
                 >
                   <div className="mb-4">
                     <h3 className="text-lg font-semibold text-neutral mb-1">
-                      Match with {match.opponent?.name || 'Unknown Player'}
+                      Match with {match.opponent?.nickname || 'Unknown Player'}
                     </h3>
                     <div className="space-y-1 text-sm text-gray-300">
                       <p><span className="font-medium">Skill:</span> {match.opponent?.skill_level || 'N/A'}</p>

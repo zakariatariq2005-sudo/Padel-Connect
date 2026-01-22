@@ -44,7 +44,7 @@ export default function PlayerList({ players, currentUserId }: { players: any[];
         >
           <div className="mb-4">
             <h3 className="text-xl font-heading font-semibold text-dark mb-2">
-              {player.name}
+              {player.nickname || 'Unknown Player'}
             </h3>
             <div className="space-y-1 text-sm text-gray-600">
               <p>

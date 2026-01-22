@@ -13,7 +13,8 @@ export default function UserStatusCard({
   profile 
 }: { 
   profile: {
-    name: string;
+    name?: string;
+    nickname?: string;
     skill_level: string;
     location: string;
     is_online: boolean;
@@ -48,7 +49,7 @@ export default function UserStatusCard({
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h2 className="text-2xl font-heading font-bold text-neutral mb-3">
-            {profile.name}
+            {profile.nickname || 'Unknown Player'}
           </h2>
           <div className="flex items-center gap-3 flex-wrap">
             <span className={getSkillBadge(profile.skill_level)}>

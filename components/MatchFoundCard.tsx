@@ -13,7 +13,8 @@ export default function MatchFoundCard({
   loading,
 }: {
   opponent: {
-    name: string;
+    name?: string;
+    nickname?: string;
     skill_level: string;
     location: string;
   };
@@ -37,6 +38,7 @@ export default function MatchFoundCard({
   };
 
   const getAvatarInitials = (name: string) => {
+    if (!name) return '??';
     return name
       .split(' ')
       .map((n) => n[0])
@@ -64,11 +66,11 @@ export default function MatchFoundCard({
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent 
                         flex items-center justify-center text-white font-bold text-xl
                         shadow-lg shadow-primary/30">
-            {getAvatarInitials(opponent.name)}
+            {getAvatarInitials(opponent.nickname || '')}
           </div>
           <div className="flex-1">
             <h4 className="text-xl font-heading font-semibold text-neutral mb-1">
-              {opponent.name}
+              {opponent.nickname || 'Unknown Player'}
             </h4>
             <div className="flex items-center gap-3 flex-wrap">
               <span className={getSkillBadge(opponent.skill_level)}>
@@ -108,6 +110,8 @@ export default function MatchFoundCard({
     </div>
   );
 }
+
+
 
 
 

@@ -40,20 +40,24 @@ export async function getUserProfile() {
     .single();
 
   if (error || !profile) {
-    // If profile doesn't exist, create one
+    // If profile doesn't exist, create one (but without nickname - user must set it)
     const { data: newProfile } = await supabase
       .from('players')
       .insert({
         user_id: user.id,
-        name: user.email?.split('@')[0] || 'Player',
         skill_level: 'Beginner',
         location: 'Unknown',
-        is_online: true,
+        is_online: false, // Don't allow online until nickname is set
       })
       .select()
       .single();
 
     return newProfile;
+  }
+
+  // Enforce nickname requirement - if missing, user must complete profile
+  if (!profile.nickname) {
+    redirect('/complete-profile');
   }
 
   return profile;
