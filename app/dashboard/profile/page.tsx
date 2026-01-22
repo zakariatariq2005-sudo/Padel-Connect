@@ -83,7 +83,8 @@ export default function ProfilePage() {
     loadProfile();
   }, [router, supabase]);
 
-  if (loading || !isClient) {
+  // Wait for both client-side hydration and data loading
+  if (loading || !isClient || !user || !profile) {
     return (
       <div className="min-h-screen bg-dark flex items-center justify-center">
         <div className="text-center">
@@ -92,10 +93,6 @@ export default function ProfilePage() {
         </div>
       </div>
     );
-  }
-
-  if (!user) {
-    return null;
   }
 
   const handleAvatarClick = () => {
