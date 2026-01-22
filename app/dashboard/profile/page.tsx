@@ -250,6 +250,72 @@ export default function ProfilePage() {
     setEditingNickname(false);
   };
 
+  const handleSaveSkillLevel = async () => {
+    setSaving(true);
+    try {
+      const { error: updateError } = await supabase
+        .from('players')
+        .update({ skill_level: skillLevel })
+        .eq('user_id', user.id);
+
+      if (updateError) {
+        alert('Failed to update skill level. Please try again.');
+        setSaving(false);
+        return;
+      }
+
+      setProfile({ ...profile, skill_level: skillLevel });
+      setEditingSkillLevel(false);
+      setSaving(false);
+      router.refresh();
+    } catch (err) {
+      alert('An unexpected error occurred');
+      setSaving(false);
+    }
+  };
+
+  const handleSaveLocation = async () => {
+    setSaving(true);
+    try {
+      const trimmedLocation = location.trim();
+      if (!trimmedLocation) {
+        alert('Location cannot be empty');
+        setSaving(false);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from('players')
+        .update({ location: trimmedLocation })
+        .eq('user_id', user.id);
+
+      if (updateError) {
+        alert('Failed to update location. Please try again.');
+        setSaving(false);
+        return;
+      }
+
+      setProfile({ ...profile, location: trimmedLocation });
+      setLocation(trimmedLocation);
+      setEditingLocation(false);
+      setSaving(false);
+      router.refresh();
+    } catch (err) {
+      alert('An unexpected error occurred');
+      setSaving(false);
+    }
+  };
+
+  const handleCancelEditSkillLevel = () => {
+    setSkillLevel(profile?.skill_level || 'Beginner');
+    setEditingSkillLevel(false);
+  };
+
+  const handleCancelEditLocation = () => {
+    setLocation(profile?.location || '');
+    setEditingLocation(false);
+  };
+
   return (
     <div className="min-h-screen bg-dark pb-20 md:pb-0">
       <Header isOnline={profile?.is_online || false} />
