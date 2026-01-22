@@ -29,9 +29,14 @@ export default function ProfilePage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
   
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -459,7 +464,7 @@ export default function ProfilePage() {
       <BottomNav />
 
       {/* Crop Modal */}
-      {showCropModal && imageToCrop && (
+      {isClient && showCropModal && imageToCrop && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
           <div className="bg-dark-light rounded-lg p-6 max-w-2xl w-full mx-4 border border-dark-lighter">
             <h3 className="text-xl font-heading font-bold text-neutral mb-4 text-center">
