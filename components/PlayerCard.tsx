@@ -23,7 +23,7 @@ export default function PlayerCard({
           {player.photo_url ? (
             <img
               src={player.photo_url}
-              alt={player.nickname || 'Player'}
+              alt={player.name || 'Player'}
               className="w-16 h-16 rounded-full object-cover border-2 border-primary"
             />
           ) : (
@@ -36,7 +36,7 @@ export default function PlayerCard({
         </div>
         <div className="flex items-center justify-center gap-2 mb-2">
           <h3 className="text-lg font-heading font-semibold text-neutral">
-            {player.nickname || 'Unknown Player'}
+            {player.name || 'Unknown Player'}
           </h3>
           <span className="w-2 h-2 bg-secondary rounded-full" title="Online"></span>
         </div>
