@@ -44,6 +44,7 @@ export default function SignupPage() {
     }
     
     // Check uniqueness
+    // Note: This requires an RLS policy that allows unauthenticated users to check nickname availability
     const { data, error } = await supabase
       .from('players')
       .select('nickname')
@@ -51,7 +52,10 @@ export default function SignupPage() {
       .limit(1);
     
     if (error) {
-      return 'Error checking nickname availability';
+      console.error('Nickname validation error:', error);
+      // Don't block signup if validation fails - just show a warning
+      // The database constraint will catch duplicates on insert
+      return null; // Allow to proceed, database will validate on insert
     }
     
     if (data && data.length > 0) {
@@ -77,11 +81,14 @@ export default function SignupPage() {
     }
     
     // Check uniqueness only if valid length
+    // If validation fails due to RLS/permissions, we'll validate on submit instead
     if (trimmed.length >= 3 && trimmed.length <= 20) {
       const error = await validateNickname(trimmed);
-      if (error) {
+      if (error && error !== 'Error checking nickname availability') {
+        // Only show error if it's not a permission/RLS error
         setNicknameError(error);
       }
+      // If it's an RLS error, silently continue - validation will happen on submit
     }
   };
 
