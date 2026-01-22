@@ -1,21 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import LogoutButton from '@/components/LogoutButton';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
-
-// Dynamically import Cropper to avoid SSR issues
-const Cropper = dynamic(
-  () => import('react-easy-crop').then((mod) => mod.default),
-  {
-    ssr: false,
-    loading: () => <div className="w-full h-96 bg-dark rounded-lg flex items-center justify-center text-gray-400">Loading cropper...</div>
-  }
-) as any;
 
 /**
  * Profile Page
@@ -32,20 +22,8 @@ export default function ProfilePage() {
   const [skillLevel, setSkillLevel] = useState('');
   const [saving, setSaving] = useState(false);
   
-  // Crop state
-  const [showCropModal, setShowCropModal] = useState(false);
-  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
-  const [isClient, setIsClient] = useState(false);
-  
   const router = useRouter();
   const supabase = createClient();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -83,8 +61,7 @@ export default function ProfilePage() {
     loadProfile();
   }, [router, supabase]);
 
-  // Wait for both client-side hydration and data loading
-  if (loading || !isClient || !user || !profile) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-dark flex items-center justify-center">
         <div className="text-center">
@@ -95,102 +72,34 @@ export default function ProfilePage() {
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
   const handleAvatarClick = () => {
     const fileInput = document.getElementById('profile-photo-input') as HTMLInputElement;
     fileInput?.click();
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
-        return;
-      }
-
-      // Show crop modal instead of uploading immediately
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageToCrop(reader.result as string);
-        setShowCropModal(true);
-        setCrop({ x: 0, y: 0 });
-        setZoom(1);
-      };
-      reader.readAsDataURL(file);
-      
-      // Reset file input
-      e.target.value = '';
-    }
-  };
-
-  const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
-
-  const createImage = (url: string): Promise<HTMLImageElement> =>
-    new Promise((resolve, reject) => {
-      const image = new Image();
-      image.addEventListener('load', () => resolve(image));
-      image.addEventListener('error', (error) => reject(error));
-      image.src = url;
-    });
-
-  const getCroppedImg = async (imageSrc: string, pixelCrop: any): Promise<Blob> => {
-    const image = await createImage(imageSrc);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
-      throw new Error('No 2d context');
-    }
-
-    // Set canvas size to crop size
-    const size = Math.min(pixelCrop.width, pixelCrop.height);
-    canvas.width = size;
-    canvas.height = size;
-
-    // Draw circular crop
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
-    ctx.clip();
-
-    // Calculate scale to fit image
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-
-    // Draw image centered and scaled
-    ctx.drawImage(
-      image,
-      pixelCrop.x * scaleX,
-      pixelCrop.y * scaleY,
-      pixelCrop.width * scaleX,
-      pixelCrop.height * scaleY,
-      0,
-      0,
-      size,
-      size
-    );
-
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
-        if (blob) {
-          resolve(blob);
-        }
-      }, 'image/jpeg', 0.9);
-    });
-  };
-
-  const handleCropComplete = async () => {
-    if (!imageToCrop || !croppedAreaPixels || !user) {
+    if (!file || !file.type.startsWith('image/')) {
       return;
     }
 
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+    if (!user) {
+      alert('Not authenticated. Please log in again.');
+      return;
+    }
+
+    setSaving(true);
+
     try {
-      setSaving(true);
-      
-      // Create cropped image
-      const croppedImage = await getCroppedImg(imageToCrop, croppedAreaPixels);
-      
       // Get old photo URL before uploading new one
       const { data: oldProfile } = await supabase
         .from('players')
@@ -202,13 +111,13 @@ export default function ProfilePage() {
       const fileName = `${user.id}-${Date.now()}.jpg`;
       const filePath = `profile-photos/${fileName}`;
 
-      // Upload cropped image to Supabase Storage
+      // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, croppedImage, {
+        .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
-          contentType: 'image/jpeg'
+          contentType: file.type
         });
 
       if (uploadError) {
@@ -222,8 +131,6 @@ export default function ProfilePage() {
           alert(uploadError.message || 'Failed to upload image');
         }
         
-        setShowCropModal(false);
-        setImageToCrop(null);
         setSaving(false);
         return;
       }
@@ -244,8 +151,6 @@ export default function ProfilePage() {
       if (updateError) {
         await supabase.storage.from('avatars').remove([filePath]);
         alert('Failed to update profile with photo URL');
-        setShowCropModal(false);
-        setImageToCrop(null);
         setSaving(false);
         return;
       }
@@ -275,29 +180,18 @@ export default function ProfilePage() {
         setProfile(profileData);
       }
 
-      // Close crop modal
-      setShowCropModal(false);
-      setImageToCrop(null);
-      setSelectedImagePreview(null);
       setSaving(false);
+      
+      // Reset file input
+      e.target.value = '';
     } catch (err) {
-      console.error('Crop/Upload error:', err);
-      alert('Failed to crop and upload photo');
-      setShowCropModal(false);
-      setImageToCrop(null);
+      console.error('Upload error:', err);
+      alert('Failed to upload photo');
       setSaving(false);
     }
   };
 
-  const handleCropCancel = () => {
-    setShowCropModal(false);
-    setImageToCrop(null);
-    setCrop({ x: 0, y: 0 });
-    setZoom(1);
-  };
-
-  // Only compute displayImage after client-side hydration to avoid mismatch
-  const displayImage = isClient ? (selectedImagePreview || profile?.photo_url) : null;
+  const displayImage = selectedImagePreview || profile?.photo_url;
 
   const handleSaveSkillLevel = async () => {
     setSaving(true);
@@ -340,7 +234,7 @@ export default function ProfilePage() {
               onClick={handleAvatarClick}
               className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-dark-lighter hover:border-primary transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-dark-light"
             >
-              {isClient && displayImage ? (
+              {displayImage ? (
                 <img
                   src={displayImage}
                   alt="Profile"
@@ -469,68 +363,6 @@ export default function ProfilePage() {
       </main>
 
       <BottomNav />
-
-      {/* Crop Modal */}
-      {isClient && showCropModal && imageToCrop && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-          <div className="bg-dark-light rounded-lg p-6 max-w-2xl w-full mx-4 border border-dark-lighter">
-            <h3 className="text-xl font-heading font-bold text-neutral mb-4 text-center">
-              Crop Your Profile Photo
-            </h3>
-            <p className="text-sm text-gray-400 mb-4 text-center">
-              Adjust the circle to focus on the part of the photo you want to show
-            </p>
-            
-            <div className="relative w-full h-96 bg-dark rounded-lg overflow-hidden mb-4">
-              <Cropper
-                image={imageToCrop}
-                crop={crop}
-                zoom={zoom}
-                aspect={1}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
-                cropShape="round"
-                showGrid={false}
-              />
-            </div>
-
-            {/* Zoom Control */}
-            <div className="mb-4">
-              <label className="block text-sm text-gray-300 mb-2">
-                Zoom: {Math.round(zoom * 100)}%
-              </label>
-              <input
-                type="range"
-                min={1}
-                max={3}
-                step={0.1}
-                value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-                className="w-full h-2 bg-dark-lighter rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={handleCropCancel}
-                disabled={saving}
-                className="px-6 py-2 bg-gray-200 text-dark font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCropComplete}
-                disabled={saving}
-                className="px-6 py-2 bg-secondary text-neutral font-medium rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {saving ? 'Uploading...' : 'Save Photo'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
