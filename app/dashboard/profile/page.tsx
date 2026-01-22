@@ -152,6 +152,10 @@ export default function ProfilePage() {
     }
     
     // Check uniqueness (excluding current user)
+    if (!user) {
+      return 'Not authenticated';
+    }
+
     const { data, error } = await supabase
       .from('players')
       .select('nickname, user_id')
@@ -159,12 +163,18 @@ export default function ProfilePage() {
       .limit(1);
     
     if (error) {
-      return 'Error checking nickname availability';
+      console.error('Nickname validation error:', error);
+      // Don't block if it's an RLS/permission error - database will validate on save
+      return null;
     }
     
-    // Allow if it's the current user's nickname (no change)
-    if (data && data.length > 0 && data[0].user_id !== user.id) {
-      return 'This nickname is already taken';
+    // Allow if it's the current user's nickname (no change) or if no one else has it
+    if (data && data.length > 0) {
+      const existingUser = data[0];
+      if (existingUser.user_id !== user.id) {
+        return 'This nickname is already taken';
+      }
+      // It's the current user's nickname - allow it
     }
     
     return null;
@@ -237,7 +247,7 @@ export default function ProfilePage() {
       setProfile({ ...profile, nickname: trimmedNickname });
       setEditingNickname(false);
       setSavingNickname(false);
-      router.refresh();
+      // Don't refresh - just update local state
     } catch (err) {
       setNicknameError('An unexpected error occurred');
       setSavingNickname(false);
@@ -267,7 +277,7 @@ export default function ProfilePage() {
       setProfile({ ...profile, skill_level: skillLevel });
       setEditingSkillLevel(false);
       setSaving(false);
-      router.refresh();
+      // Don't refresh - just update local state
     } catch (err) {
       alert('An unexpected error occurred');
       setSaving(false);
@@ -299,7 +309,7 @@ export default function ProfilePage() {
       setLocation(trimmedLocation);
       setEditingLocation(false);
       setSaving(false);
-      router.refresh();
+      // Don't refresh - just update local state
     } catch (err) {
       alert('An unexpected error occurred');
       setSaving(false);
@@ -386,7 +396,7 @@ export default function ProfilePage() {
                     onChange={(e) => handleNicknameChange(e.target.value)}
                     minLength={3}
                     maxLength={20}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition text-dark ${
                       nicknameError ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="Choose a unique nickname (3-20 chars)"
